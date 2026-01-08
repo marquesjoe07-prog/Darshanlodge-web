@@ -92,9 +92,16 @@ import {
             try {
                 const res = await signInWithEmailAndPassword(auth, e, p);
                 const snap = await getDoc(doc(db, "users", res.user.uid));
-                if(snap.exists()) {
-                    window.location.href = snap.data().role === 'admin' ? 'admin.html' : 'tenant.html';
-                }
+                // index.html ke handleLogin function ke andar
+               if(snap.exists()) {
+                const userData = snap.data();
+               if(userData.role === 'admin') {
+               window.location.href = 'admin.html';
+                } else {
+        // Yahan check karein ki file ka naam sahi hai
+              window.location.href = 'tenant.html'; 
+             }
+
             } catch(err) { alert(err.message); }
         };
 
