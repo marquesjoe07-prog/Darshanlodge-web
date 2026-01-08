@@ -3,52 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tenant Dashboard - Darshan Lodge</title>
+    <title>VIP Portal - Darshan Lodge</title>
     <style>
-        :root { --gold: #d4af37; --blue-glass: rgba(0, 122, 255, 0.15); }
-        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; padding-top: 70px; }
-        .top-nav { height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
-        .container { padding: 20px; max-width: 500px; margin: auto; }
-        .due-card { background: var(--blue-glass); border: 1px solid rgba(0,122,255,0.3); border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .due-card h1 { font-size: 3.5rem; margin: 10px 0; color: #66b2ff; }
-        .history-box { background: rgba(255,255,255,0.03); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); padding: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        .status-paid { color: #2ecc71; font-weight: bold; }
-        .status-unpaid { color: #ff6b6b; font-weight: bold; }
-        .btn-logout { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 5px 12px; border-radius: 5px; cursor: pointer; }
+        :root { 
+            --gold: #d4af37; 
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --blue-glass: rgba(255, 255, 255, 0.07); 
+            --dark: #000814; 
+        }
+        
+        body { 
+            margin: 0; 
+            background: var(--dark); 
+            color: white; 
+            font-family: 'Poppins', sans-serif; 
+            min-height: 100vh;
+        }
+
+        /* Top Premium Nav */
+        .top-nav { 
+            height: 70px; 
+            background: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(15px); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 20px; 
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2); 
+            position: fixed; 
+            width: 100%; 
+            top: 0; 
+            z-index: 100; 
+            box-sizing: border-box;
+        }
+
+        .profile-area { display: flex; align-items: center; gap: 10px; }
+        .avatar-circle { 
+            width: 35px; 
+            height: 35px; 
+            background: linear-gradient(45deg, var(--gold), #f9e297); 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: black; 
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .container { padding: 90px 20px 30px; max-width: 500px; margin: auto; }
+
+        /* Stylish Greeting */
+        .greeting { margin-bottom: 25px; }
+        .greeting h2 { margin: 0; font-weight: 300; font-size: 1.2rem; opacity: 0.8; }
+        .greeting span { display: block; font-size: 1.8rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 15px var(--gold-glow); }
+
+        /* Premium Due Card */
+        .due-card { 
+            background: var(--blue-glass); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 25px; 
+            padding: 35px 20px; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        .due-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+            z-index: -1;
+        }
+        .due-card p { margin: 0; font-size: 0.9rem; opacity: 0.6; letter-spacing: 1px; }
+        .due-card h1 { font-size: 3.5rem; margin: 10px 0; color: white; font-weight: 800; }
+        
+        .info-pills { display: flex; justify-content: center; gap: 12px; margin-top: 15px; }
+        .pill { 
+            background: rgba(212, 175, 55, 0.15); 
+            border: 1px solid var(--gold); 
+            color: var(--gold); 
+            padding: 5px 15px; 
+            border-radius: 30px; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+        }
+
+        /* Modern Table */
+        .history-section { margin-top: 10px; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .history-header h4 { margin: 0; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
+        
+        .history-card { 
+            background: var(--blue-glass); 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            padding: 5px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 15px 10px; text-align: left; font-size: 0.7rem; opacity: 0.5; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 18px 10px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        
+        .status-btn { 
+            padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 700;
+        }
+        .unpaid { background: #ff4d4d33; color: #ff4d4d; border: 1px solid #ff4d4d55; }
+        .paid { background: #2ecc7133; color: #2ecc71; border: 1px solid #2ecc7155; }
+
+        .logout-link { color: #ff4d4d; font-size: 0.8rem; text-decoration: none; font-weight: 600; cursor: pointer; }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="top-nav">
-        <span style="font-weight:bold; color:var(--gold);">TENANT PORTAL</span>
-        <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        <div class="profile-area">
+            <div class="avatar-circle" id="userInitial">D</div>
+            <span style="font-weight:600; font-size:0.9rem;">VIP PORTAL</span>
+        </div>
+        <a class="logout-link" onclick="handleLogout()">LOGOUT</a>
     </div>
 
     <div class="container">
-        <div class="due-card">
-            <p style="opacity:0.7; margin-bottom:0;">Current Total Due</p>
-            <h1 id="totalDue">₹ 0</h1>
-            <p id="roomInfo" style="background:var(--gold); color:black; display:inline-block; padding:3px 15px; border-radius:20px; font-weight:bold; font-size:0.8rem;">Room: -- | Bed: --</p>
+        <div class="greeting">
+            <h2>Hi!</h2>
+            <span id="userName">Loading...</span>
         </div>
 
-        <div class="history-box">
-            <h4 style="margin-top:0; color:var(--gold);">Stay & Payment History</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date/Month</th>
-                        <th>Status</th>
-                        <th>Balance</th>
-                    </tr>
-                </thead>
-                <tbody id="historyBody">
-                    </tbody>
-            </table>
+        <div class="due-card">
+            <p>CURRENT BALANCE</p>
+            <h1 id="displayDue">₹ 0</h1>
+            <div class="info-pills">
+                <div class="pill" id="roomPill">Room: --</div>
+                <div class="pill" id="bedPill">Bed: --</div>
+            </div>
         </div>
-        
-        <p style="text-align:center; font-size:0.7rem; opacity:0.5; margin-top:20px;">Monthly rent is added on the 1st of every month.</p>
+
+        <div class="history-section">
+            <div class="history-header">
+                <h4>Recent Ledger</h4>
+                <span style="font-size:0.7rem; opacity:0.4;">Updated Just Now</span>
+            </div>
+            <div class="history-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p style="text-align:center; font-size:0.65rem; opacity:0.3; margin-top:40px; line-height:1.5;">
+            This is a secure digital record of Darshan Lodge.<br>
+            All disputes are subject to Darshan Lodge Management.
+        </p>
     </div>
 
     <script type="module">
@@ -74,29 +189,40 @@
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if (snap.exists()) {
                     const data = snap.data();
-                    // Load current balance and room
-                    document.getElementById('totalDue').innerText = `₹ ${data.totalDue || 0}`;
-                    document.getElementById('roomInfo').innerText = `Room: ${data.room} | Bed: ${data.bed}`;
                     
-                    // Display initial history row
-                    updateHistoryTable(data.totalDue);
+                    // Profile Icon logic (Name ka pehla letter)
+                    const name = data.name || "User";
+                    document.getElementById('userInitial').innerText = name.charAt(0).toUpperCase();
+                    
+                    // Stylish Greeting
+                    document.getElementById('userName').innerText = name;
+                    
+                    // Data Display
+                    document.getElementById('displayDue').innerText = `₹ ${data.totalDue || 0}`;
+                    document.getElementById('roomPill').innerText = `Room: ${data.room}`;
+                    document.getElementById('bedPill').innerText = `Bed: ${data.bed}`;
+                    
+                    loadHistory(data.totalDue);
                 }
             } else {
                 window.location.href = 'index.html';
             }
         });
 
-        function updateHistoryTable(due) {
-            const tbody = document.getElementById('historyBody');
-            const statusClass = due > 0 ? "status-unpaid" : "status-paid";
-            const statusText = due > 0 ? "UNPAID" : "CLEARED";
-            const month = new Date().toLocaleString('default', { month: 'long' });
+        function loadHistory(due) {
+            const table = document.getElementById('historyBody');
+            const monthName = new Date().toLocaleString('default', { month: 'short' });
+            const year = new Date().getFullYear();
+            
+            const statusClass = due > 0 ? "unpaid" : "paid";
+            const statusText = due > 0 ? "UNPAID" : "PAID";
 
-            tbody.innerHTML = `
+            table.innerHTML = `
                 <tr>
-                    <td>${month} 2026</td>
-                    <td class="${statusClass}">${statusText}</td>
-                    <td>₹ ${due}</td>
+                    <td>${monthName} ${year}</td>
+                    <td>Monthly Rent</td>
+                    <td><span class="status-btn ${statusClass}">${statusText}</span></td>
+                    <td style="font-weight:bold;">₹ ${due}</td>
                 </tr>
             `;
         }
