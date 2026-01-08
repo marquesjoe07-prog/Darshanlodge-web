@@ -65,7 +65,7 @@
 
         <div class="greeting-section">
             <p>It is a distinct pleasure to have you staying with us,</p>
-            <h2 id="Hello! userName">Valued Resident</h2>
+            <h2 id="userName">Valued Resident</h2>
         </div>
 
         <div class="due-card">
@@ -142,7 +142,7 @@
                     const initial = tenantData.name ? tenantData.name.charAt(0).toUpperCase() : "U";
                     document.getElementById('userAvatar').innerText = initial;
                     document.getElementById('modalAvatar').innerText = initial;
-                    document.getElementById('userName').innerText = tenantData.name;
+                    document.getElementById('userName').innerText = 'Hello!$(tenantData.name)';
                     document.getElementById('displayDue').innerText = `₹ ${tenantData.totalDue || 0}`;
                     document.getElementById('roomPill').innerText = `Room: ${tenantData.room}`;
                     document.getElementById('bedPill').innerText = `Bed: ${tenantData.bed}`;
