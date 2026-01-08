@@ -3,64 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Admin - Darshan Lodge</title>
+    <title>Admin - Darshan Lodge</title>
     <style>
         :root { --gold: #d4af37; --blue-glass: rgba(0, 122, 255, 0.15); }
-        body { margin: 0; background: #000a1a; color: white; display: flex; font-family: sans-serif; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
         
-        .sidebar { width: 280px; background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); padding: 80px 20px; border-right: 1px solid rgba(255,255,255,0.1); }
-        .main { flex: 1; padding: 30px; padding-top: 90px; overflow-y: auto; }
+        /* Fixed Header for Mobile */
+        .top-nav { position: fixed; top: 0; width: 100%; height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        /* Main Container: Mobile me Sidebar upar aur Grid niche ho jayega */
+        .container { display: flex; flex-direction: column; padding-top: 70px; padding-bottom: 80px; }
+
+        /* Sidebar - Mobile me horizontal scroll ya list ban jayega */
+        .sidebar { padding: 15px; background: rgba(255,255,255,0.03); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
         
-        /* Layout Grid */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .room-card { background: rgba(255,255,255,0.07); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); min-height: 150px; }
-        
-        /* UI Elements */
-        .btn-circle { position: fixed; top: 20px; left: 20px; width: 45px; height: 45px; border-radius: 50%; background: var(--gold); border: none; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px var(--gold); }
-        .btn-square { position: fixed; top: 20px; right: 20px; width: 45px; height: 45px; background: rgba(255,255,255,0.1); border: 1px solid white; border-radius: 10px; cursor: pointer; z-index: 1000; }
-        .tab-btn { width: 100%; padding: 12px; margin-bottom: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; text-align: left; border-radius: 8px; cursor: pointer; }
-        
-        .bottom-bar { position: fixed; bottom: 0; right: 0; left: 280px; background: var(--blue-glass); padding: 20px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(0,122,255,0.3); }
+        /* Grid - Mobile me 1 column, Tablet me 2 column */
+        .main { padding: 15px; }
+        .room-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 600px) { .room-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .room-card { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+
+        /* Buttons */
+        .btn-circle { position: absolute; left: 15px; width: 35px; height: 35px; border-radius: 50%; background: var(--gold); border: none; }
+        .btn-square { position: absolute; right: 15px; width: 35px; height: 35px; background: rgba(255,255,255,0.1); border: 1px solid white; border-radius: 5px; }
+        .nav-link { font-size: 0.8rem; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; cursor: pointer; }
+
+        /* Bottom Bar */
+        .revenue-bar { position: fixed; bottom: 0; width: 100%; background: rgba(0,122,255,0.25); backdrop-filter: blur(15px); padding: 15px; border-top: 1px solid rgba(0,122,255,0.3); text-align: center; box-sizing: border-box; }
     </style>
 </head>
 <body>
-    <button class="btn-circle" onclick="openAddAdmin()">➕</button>
-    <div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,0.1); padding:10px 30px; border-radius:30px; border:1px solid var(--gold); font-weight:bold; letter-spacing:1px; z-index:900;">ADMIN DASHBOARD</div>
-    <button class="btn-square" onclick="openProfile()">👤</button>
 
-    <div class="sidebar">
-        <button class="tab-btn">📜 Edit Lodge Rules</button>
-        <button class="tab-btn">📩 Signup Approval Review</button>
-        <button class="tab-btn">📞 Tenant Phone Directory</button>
-        <button class="tab-btn" style="color:#ff6b6b">⚠️ Unpaid Defaulters</button>
+    <div class="top-nav">
+        <button class="btn-circle">➕</button>
+        <span style="font-weight:bold; font-size:0.9rem; letter-spacing:1px;">ADMIN DASHBOARD</span>
+        <button class="btn-square">👤</button>
     </div>
 
-    <div class="main">
-        <div class="grid">
-            <div class="room-card"><h3>Room 1</h3><div id="room1List" style="opacity:0.6">No Tenants Assigned</div></div>
-            <div class="room-card"><h3>Room 2</h3><div id="room2List" style="opacity:0.6">No Tenants Assigned</div></div>
-            <div class="room-card"><h3>Room 3</h3><div id="room3List" style="opacity:0.6">No Tenants Assigned</div></div>
-            <div class="room-card"><h3>Room 4</h3><div id="room4List" style="opacity:0.6">No Tenants Assigned</div></div>
+    <div class="container">
+        <div class="sidebar">
+            <button class="nav-link">📜 Rules</button>
+            <button class="nav-link">📩 Approvals</button>
+            <button class="nav-link">📞 Directory</button>
+            <button class="nav-link" style="color:#ff6b6b">⚠️ Unpaid</button>
+        </div>
+
+        <div class="main">
+            <div class="room-grid">
+                <div class="room-card"><h3>Room 1</h3><p>Empty</p></div>
+                <div class="room-card"><h3>Room 2</h3><p>Empty</p></div>
+                <div class="room-card"><h3>Room 3</h3><p>Empty</p></div>
+                <div class="room-card"><h3>Room 4</h3><p>Empty</p></div>
+            </div>
         </div>
     </div>
 
-    <div class="bottom-bar">
-        <div>Total Payment Received (Monthly): <strong style="color:#2ecc71; font-size:1.2rem;">₹ 0.00</strong></div>
-        <button onclick="monthlyReset()" style="background:#e74c3c; border:none; color:white; padding:10px 20px; border-radius:8px; cursor:pointer;">Monthly Reset</button>
+    <div class="revenue-bar">
+        <div style="font-size:0.9rem;">Total Monthly: <strong style="color:#2ecc71">₹ 0.00</strong></div>
+        <button style="margin-top:8px; background:#e74c3c; color:white; border:none; padding:5px 12px; border-radius:4px; font-size:0.7rem;">Monthly Reset</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
-            authDomain: "darshan-lodge-16d22.firebaseapp.com",
-            projectId: "darshan-lodge-16d22",
-            storageBucket: "darshan-lodge-16d22.firebasestorage.app",
-            messagingSenderId: "834416173936",
-            appId: "1:834416173936:web:c6e62b396e5072f3e7e5b5"
-        };
-        const app = initializeApp(firebaseConfig);
-        // Admin Logic: Sub-admin generation and Room Assignments go here
-    </script>
 </body>
 </html>
