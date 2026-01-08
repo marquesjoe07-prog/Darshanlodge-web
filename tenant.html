@@ -5,122 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tenant Portal - Darshan Lodge</title>
     <style>
-        :root { 
-            --gold: #d4af37; 
-            --gold-glow: rgba(212, 175, 55, 0.4);
-            --blue-glass: rgba(255, 255, 255, 0.08); 
-            --dark: #000814; 
-        }
+        :root { --gold: #d4af37; --blue-glass: rgba(0, 122, 255, 0.15); --dark: #000a1a; --gold-glow: rgba(212, 175, 55, 0.3); }
+        body { margin: 0; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
         
-        body { margin: 0; background: var(--dark); color: white; font-family: 'Poppins', sans-serif; min-height: 100vh; }
-
-        /* Top Bar */
-        .top-nav { 
-            height: 70px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); 
-            position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box;
-        }
-
-        .header-title { font-weight: 800; color: var(--gold); letter-spacing: 1px; font-size: 0.9rem; }
-
-        /* Profile Avatar */
-        .avatar-circle { 
-            width: 40px; height: 40px; 
-            background: linear-gradient(45deg, var(--gold), #f9e297); 
-            border-radius: 50%; display: flex; justify-content: center; align-items: center; 
-            color: black; font-weight: bold; cursor: pointer;
-            box-shadow: 0 0 15px var(--gold-glow); transition: 0.3s;
-        }
+        /* Top Navigation */
+        .top-nav { height: 70px; background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
+        
+        /* Profile Icon Style */
+        .avatar-circle { width: 40px; height: 40px; background: linear-gradient(45deg, var(--gold), #f9e297); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px var(--gold-glow); transition: 0.3s; }
         .avatar-circle:hover { transform: scale(1.1); }
 
-        .container { padding: 100px 20px 40px; max-width: 500px; margin: auto; }
+        .container { padding: 100px 20px 20px; max-width: 500px; margin: auto; }
 
-        /* Greeting Section */
-        .greeting { margin-bottom: 30px; }
-        .greeting h2 { margin: 0; font-weight: 300; font-size: 1.3rem; opacity: 0.8; }
-        .greeting span { display: block; font-size: 2rem; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px var(--gold-glow); }
+        /* Big Branding */
+        .lodge-banner { text-align: center; margin-bottom: 30px; }
+        .lodge-banner h1 { font-size: 2.5rem; color: var(--gold); margin: 0; letter-spacing: 2px; text-shadow: 0 0 15px var(--gold-glow); }
 
-        /* Balance Card */
-        .due-card { 
-            background: var(--blue-glass); border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 30px; padding: 40px 20px; text-align: center; margin-bottom: 35px; 
-            backdrop-filter: blur(10px); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-        }
-        .due-card p { margin: 0; font-size: 0.8rem; opacity: 0.5; letter-spacing: 2px; text-transform: uppercase; }
-        .due-card h1 { font-size: 4rem; margin: 10px 0; color: white; font-weight: 900; }
-        
-        .pill-box { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-        .pill { background: rgba(212, 175, 55, 0.12); border: 1px solid var(--gold); color: var(--gold); padding: 6px 18px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+        /* Rent Card */
+        .due-card { background: var(--blue-glass); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .due-card h1 { font-size: 3.5rem; margin: 10px 0; color: white; font-weight: 800; }
+        .room-tag { background: var(--gold); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
 
-        /* Ledger Table */
-        .history-card { background: var(--blue-glass); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+        /* History Table */
+        .section-title { font-size: 1.1rem; color: var(--gold); margin-bottom: 15px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .history-box { background: rgba(255,255,255,0.03); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
-        th { padding: 15px; text-align: left; font-size: 0.7rem; opacity: 0.4; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--gold); }
-        td { padding: 20px 15px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        
-        .status-badge { padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
-        .unpaid { background: #ff4d4d22; color: #ff4d4d; border: 1px solid #ff4d4d44; }
-        .paid { background: #2ecc7122; color: #2ecc71; border: 1px solid #2ecc7144; }
+        th { background: rgba(255,255,255,0.05); text-align: left; padding: 12px; font-size: 0.8rem; opacity: 0.7; color: var(--gold); }
+        td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .status-paid { color: #2ecc71; font-weight: bold; }
+        .status-unpaid { color: #ff4d4d; font-weight: bold; }
 
-        /* Modal for Profile */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: #001226; border: 1px solid var(--gold); padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
-        .btn-close { background: var(--gold); color: black; border: none; padding: 10px 30px; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        /* Profile Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: #001529; padding: 25px; border-radius: 20px; border: 1px solid var(--gold); width: 100%; max-width: 400px; text-align: center; }
+
+        .btn-pay { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 12px; color: black; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 20px; }
+        .logout-btn { background: none; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; margin-top: 15px; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="top-nav">
-        <span class="header-title">TENANT DASHBOARD</span>
+        <span style="font-weight:bold; letter-spacing:1px; color:var(--gold);">TENANT PORTAL</span>
         <div class="avatar-circle" id="userAvatar" onclick="openProfile()">?</div>
     </div>
 
     <div class="container">
-        <div class="greeting">
-            <h2>Hi!</h2>
-            <span id="userName">Loading...</span>
+        <div class="lodge-banner">
+            <h1>DARSHAN LODGE</h1>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h2 id="tenantName" style="margin:0; font-weight: 300;">Welcome!</h2>
+            <p style="opacity:0.6; font-size:0.9rem;">Manage your stay and payments</p>
         </div>
 
         <div class="due-card">
-            <p>Total Outstanding</p>
-            <h1 id="displayDue">₹ 0</h1>
-            <div class="pill-box">
-                <div class="pill" id="roomPill">Room: --</div>
-                <div class="pill" id="bedPill">Bed: --</div>
+            <span style="opacity:0.7; font-size:0.9rem;">Total Outstanding Rent</span>
+            <h1 id="totalDue">₹ 0.00</h1>
+            <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+                <span class="room-tag" id="roomNo">Room: --</span>
+                <span class="room-tag" id="bedNo">Bed: --</span>
             </div>
         </div>
 
-        <h4 style="color:var(--gold); margin-bottom:15px; font-size:0.9rem; letter-spacing:1px;">RECENT ACTIVITY</h4>
-        <div class="history-card">
+        <span class="section-title">Payment History</span>
+        <div class="history-box">
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Amount</th>
+                        <th>MONTH / DATE</th>
+                        <th>AMOUNT</th>
+                        <th>STATUS</th>
                     </tr>
                 </thead>
-                <tbody id="ledgerBody">
+                <tbody id="historyList">
                     </tbody>
             </table>
         </div>
+
+        <button class="btn-pay" onclick="alert('Opening Payment Gateway...')">Pay Monthly Rent</button>
+        <p style="text-align:center; font-size:0.7rem; opacity:0.5; margin-top:15px;">Note: Any unpaid rent will be added to the next month.</p>
     </div>
 
     <div id="profileModal" class="modal">
         <div class="modal-box">
-            <div class="avatar-circle" style="width:70px; height:70px; font-size:1.5rem; margin: 0 auto 15px;" id="modalAvatar">?</div>
-            <h2 id="modalName" style="color:var(--gold); margin:0;">Name</h2>
-            <p id="modalEmail" style="opacity:0.6; margin:5px 0 20px;">email@example.com</p>
-            <div style="text-align:left; background:rgba(255,255,255,0.03); padding:15px; border-radius:15px;">
-                <p><b>Phone:</b> <span id="modalPhone">--</span></p>
-                <p><b>Guardian:</b> <span id="modalParent">--</span></p>
-                <p><b>Status:</b> <span style="color:#2ecc71">Active</span></p>
+            <div class="avatar-circle" style="width:60px; height:60px; margin:0 auto 15px; font-size:1.5rem;" id="modalAvatar">?</div>
+            <h3 id="pName" style="color:var(--gold); margin:0;">Name</h3>
+            <p id="pEmail" style="opacity:0.6; margin-bottom:20px;">Email</p>
+            <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
+                <p><b>Phone:</b> <span id="pPhone">--</span></p>
+                <p><b>Guardian:</b> <span id="pParent">--</span></p>
+                <p><b>Allotted:</b> Room <span id="pRoom">--</span> / Bed <span id="pBed">--</span></p>
             </div>
-            <button class="btn-close" onclick="closeProfile()">Close</button>
-            <br><br>
-            <a href="#" onclick="handleLogout()" style="color:#ff4d4d; font-size:0.8rem;">Logout from Device</a>
+            <button class="btn-pay" style="padding:10px;" onclick="closeProfile()">Close</button><br>
+            <button class="logout-btn" onclick="handleLogout()">Logout Session</button>
         </div>
     </div>
 
@@ -142,57 +121,62 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentUserData = null;
+        let userData = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if (snap.exists()) {
-                    currentUserData = snap.data();
-                    updateUI(currentUserData);
+                    userData = snap.data();
+                    
+                    // UI Update
+                    const initial = userData.name ? userData.name.charAt(0).toUpperCase() : "U";
+                    document.getElementById('userAvatar').innerText = initial;
+                    document.getElementById('modalAvatar').innerText = initial;
+                    
+                    document.getElementById('tenantName').innerHTML = `Welcome, <span style="color:var(--gold); font-weight:bold;">${userData.name}</span>!`;
+                    document.getElementById('totalDue').innerText = `₹ ${userData.totalDue || 0}`;
+                    document.getElementById('roomNo').innerText = `Room: ${userData.room}`;
+                    document.getElementById('bedNo').innerText = `Bed: ${userData.bed}`;
+                    
+                    // Auto-updating table logic
+                    updateHistory(userData.totalDue);
                 }
             } else {
                 window.location.href = 'index.html';
             }
         });
 
-        function updateUI(data) {
-            const initial = data.name ? data.name.charAt(0).toUpperCase() : "U";
-            document.getElementById('userAvatar').innerText = initial;
-            document.getElementById('modalAvatar').innerText = initial;
-            document.getElementById('userName').innerText = data.name;
-            document.getElementById('displayDue').innerText = `₹ ${data.totalDue || 0}`;
-            document.getElementById('roomPill').innerText = `Room: ${data.room}`;
-            document.getElementById('bedPill').innerText = `Bed: ${data.bed}`;
+        function updateHistory(due) {
+            const list = document.getElementById('historyList');
+            const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const status = due > 0 ? '<span class="status-unpaid">UNPAID</span>' : '<span class="status-paid">CLEARED</span>';
             
-            // Ledger
-            const status = data.totalDue > 0 ? "unpaid" : "paid";
-            document.getElementById('ledgerBody').innerHTML = `
+            list.innerHTML = `
                 <tr>
-                    <td>${new Date().toLocaleString('default', { month: 'short' })} ${new Date().getFullYear()}</td>
-                    <td><span class="status-badge ${status}">${status}</span></td>
-                    <td style="font-weight:bold;">₹ ${data.totalDue}</td>
+                    <td>${date}</td>
+                    <td>₹ ${due}</td>
+                    <td>${status}</td>
                 </tr>
             `;
         }
 
-        // Profile Modal Logic
         window.openProfile = () => {
-            if(!currentUserData) return;
-            document.getElementById('modalName').innerText = currentUserData.name;
-            document.getElementById('modalEmail').innerText = currentUserData.email;
-            document.getElementById('modalPhone').innerText = currentUserData.phone || "N/A";
-            document.getElementById('modalParent').innerText = currentUserData.parentPhone || "N/A";
+            if(!userData) return;
+            document.getElementById('pName').innerText = userData.name;
+            document.getElementById('pEmail').innerText = userData.email;
+            document.getElementById('pPhone').innerText = userData.phone;
+            document.getElementById('pParent').innerText = userData.parentPhone;
+            document.getElementById('pRoom').innerText = userData.room;
+            document.getElementById('pBed').innerText = userData.bed;
             document.getElementById('profileModal').style.display = 'flex';
         };
 
-        window.closeProfile = () => {
-            document.getElementById('profileModal').style.display = 'none';
-        };
+        window.closeProfile = () => document.getElementById('profileModal').style.display = 'none';
 
         window.handleLogout = () => {
             signOut(auth).then(() => { window.location.href = 'index.html'; });
-        };
+        }
     </script>
 </body>
 </html>
