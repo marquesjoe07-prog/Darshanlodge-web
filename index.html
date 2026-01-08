@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Darshan Lodge</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000a1a;
+        color: white;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Glass Effect */
+      .sidebar {
+        width: 260px;
+        height: 100vh;
+        background: rgba(84, 42, 10, 0.3);
+        backdrop-filter: blur(15px);
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding: 20px;
+        box-sizing: border-box;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 10;
+      }
+
+      .nav-item {
+        padding: 15px;
+        margin: 10px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .nav-item:hover {
+        background: rgba(212, 175, 55, 0.2);
+      }
+
+      /* Main Content Area */
+      .main {
+        margin-left: 280px;
+        padding: 40px;
+        width: calc(100% - 280px);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+
+      .profile-icon {
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        cursor: pointer;
+      }
+
+      /* Responsive Floor/Room Grid */
+      .floor-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 25px;
+      }
+
+      .floor-box {
+        aspect-ratio: 1/1;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #d4af37;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: transform 0.3s;
+        position: relative;
+      }
+      .floor-box:hover {
+        transform: scale(1.02);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .delete-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(239, 68, 68, 0.3);
+        border: none;
+        color: #ff9999;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        z-index: 5;
+        font-weight: bold;
+      }
+
+      /* Glass Modals */
+      .glass-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .tabular-glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(25px);
+        padding: 30px;
+        border-radius: 20px;
+        width: 400px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-premium {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #d4af37, #aa8a2e);
+        border: none;
+        border-radius: 8px;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2 style="color: #d4af37; font-size: 1.1rem">DARSHAN LODGE</h2>
+      <div class="nav-item" onclick="window.showFloorGrid()">
+        Home Dashboard
+      </div>
+      <div class="nav-item" onclick="window.loadPendingRequests()">
+        Pending Requests
+      </div>
+      <div class="nav-item" onclick="window.loadComplaints()">
+        Active Complaints
+      </div>
+      <div
+        class="nav-item"
+        style="margin-top: 40px; color: #ff6b6b"
+        onclick="window.handleLogout()"
+      >
+        Sign Out
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="header">
+        <div class="profile-icon" onclick="window.toggleAdminProfile()"></div>
+        <div
+          style="
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+          "
+        >
+          ADMIN DASHBOARD
+        </div>
+        <div
+          class="profile-icon"
+          style="
+            border-radius: 50%;
+            border: 2px solid #d4af37;
+            background: none;
+          "
+        ></div>
+      </div>
+
+      <div id="mainGridArea">
+        <h2 id="viewTitle" style="color: #d4af37; margin-bottom: 20px">
+          Select a Floor
+        </h2>
+        <div class="floor-grid" id="floorGrid">
+          <div class="floor-box" onclick="window.loadFloor(1)">Floor 1</div>
+          <div class="floor-box" onclick="window.loadFloor(2)">Floor 2</div>
+          <div class="floor-box" onclick="window.loadFloor(3)">Floor 3</div>
+          <div class="floor-box" onclick="window.loadFloor(4)">Floor 4</div>
+        </div>
+      </div>
+
+      <div id="complaintsSection" style="display: none">
+        <h2 style="color: #d4af37">Active Complaints</h2>
+        <div id="complaintsList">No active complaints at the moment.</div>
+      </div>
+
+      <div id="pendingSection" style="display: none">
+        <h2 style="color: #d4af37">Pending Requests</h2>
+        <div id="requestTableBody">No pending tenant requests.</div>
+      </div>
+    </div>
+
+    <div id="adminProfileModal" class="glass-modal">
+      <div class="tabular-glass">
+        <h3>Admin Management</h3>
+        <hr style="opacity: 0.2" />
+        <input type="text" id="newAdminName" placeholder="Full Name" />
+        <input type="email" id="newAdminEmail" placeholder="Email Address" />
+        <button class="btn-premium" onclick="window.processNewAdmin()">
+          Create Admin
+        </button>
+        <button
+          class="btn-premium"
+          style="background: #444"
+          onclick="window.toggleAdminProfile()"
+        >
+          Close
+        </button>
+
+        <div
+          id="generatedPassContainer"
+          style="
+            display: none;
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+          "
+        >
+          <span style="font-size: 0.8rem; opacity: 0.8">Temp Password:</span
+          ><br />
+          <strong
+            id="displayPass"
+            style="color: #d4af37; font-size: 1.2rem"
+          ></strong>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        query,
+        where,
+        getDocs,
+        doc,
+        setDoc,
+        deleteDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+      // Your Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
+        authDomain: "darshan-lodge-16d22.firebaseapp.com",
+        projectId: "darshan-lodge-16d22",
+        storageBucket: "darshan-lodge-16d22.firebasestorage.app",
+        messagingSenderId: "834416173936",
+        appId: "1:834416173936:web:c6e62b396e5072f3e7e5b5",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // --- AUTH PROTECTION ---
+      onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "index.html";
+      });
+
+      window.handleLogout = () => {
+        if (confirm("Log out of Admin Dashboard?")) {
+          signOut(auth);
+        }
+      };
+
+      // --- NAVIGATION ---
+      window.showFloorGrid = () => {
+        document.getElementById("mainGridArea").style.display = "block";
+        document.getElementById("complaintsSection").style.display = "none";
+        document.getElementById("pendingSection").style.display = "none";
+        document.getElementById("viewTitle").innerText = "Select a Floor";
+        document.getElementById("floorGrid").innerHTML = `
+                <div class="floor-box" onclick="window.loadFloor(1)">Floor 1</div>
+                <div class="floor-box" onclick="window.loadFloor(2)">Floor 2</div>
+                <div class="floor-box" onclick="window.loadFloor(3)">Floor 3</div>
+                <div class="floor-box" onclick="window.loadFloor(4)">Floor 4</div>`;
+      };
+
+      window.loadPendingRequests = () => {
+        document.getElementById("mainGridArea").style.display = "none";
+        document.getElementById("complaintsSection").style.display = "none";
+        document.getElementById("pendingSection").style.display = "block";
+      };
+
+      window.loadComplaints = () => {
+        document.getElementById("mainGridArea").style.display = "none";
+        document.getElementById("pendingSection").style.display = "none";
+        document.getElementById("complaintsSection").style.display = "block";
+      };
+
+      // --- ROOM MANAGEMENT ---
+      window.loadFloor = async (floorNum) => {
+        const grid = document.getElementById("floorGrid");
+        document.getElementById("viewTitle").innerText =
+          "Floor " + floorNum + " Rooms";
+        grid.innerHTML =
+          '<p style="grid-column: 1/-1; text-align: center;">Opening Floor Records...</p>';
+
+        try {
+          const q = query(
+            collection(db, "rooms"),
+            where("floor", "==", floorNum)
+          );
+          const snap = await getDocs(q);
+          grid.innerHTML = "";
+
+          snap.forEach((docSnap) => {
+            const room = docSnap.data();
+            grid.innerHTML += `
+                        <div class="floor-box">
+                            <button class="delete-btn" onclick="window.deleteRoom(event, '${
+                              docSnap.id
+                            }', ${floorNum})">×</button>
+                            Room ${room.roomNumber}
+                            <div style="font-size:0.75rem; font-weight:normal; margin-top:10px; opacity: 0.7;">
+                                B1: ${room.bed1_tenant || "Empty"}<br>
+                                B2: ${room.bed2_tenant || "Empty"}
+                            </div>
+                        </div>`;
+          });
+
+          grid.innerHTML += `
+                    <div class="floor-box" style="border:2px dashed #d4af37; background: transparent;" onclick="window.addNewRoom(${floorNum})">
+                        <span style="font-size: 2rem;">+</span>
+                        <span style="font-size: 0.9rem;">Add Room</span>
+                    </div>`;
+        } catch (e) {
+          alert(
+            "Database Error: Ensure you have enabled Firestore and set Rules to Test Mode."
+          );
+          console.error(e);
+        }
+      };
+
+      window.addNewRoom = async (floorNum) => {
+        const roomNum = prompt("Enter Room Number (e.g., 101):");
+        if (!roomNum) return;
+
+        try {
+          const roomRef = doc(collection(db, "rooms"));
+          await setDoc(roomRef, {
+            roomNumber: roomNum,
+            floor: floorNum,
+            bed1_tenant: "Empty",
+            bed2_tenant: "Empty",
+            createdAt: new Date(),
+          });
+          window.loadFloor(floorNum);
+        } catch (e) {
+          alert("Action Failed: " + e.message);
+        }
+      };
+
+      window.deleteRoom = async (event, id, floorNum) => {
+        event.stopPropagation(); // Stops the floor click from firing
+        if (confirm("Permanently delete this room? This cannot be undone.")) {
+          await deleteDoc(doc(db, "rooms", id));
+          window.loadFloor(floorNum);
+        }
+      };
+
+      window.toggleAdminProfile = () => {
+        const m = document.getElementById("adminProfileModal");
+        m.style.display = m.style.display === "flex" ? "none" : "flex";
+      };
+
+      window.processNewAdmin = () => {
+        const pass =
+          "DL_" + Math.random().toString(36).substring(7).toUpperCase();
+        document.getElementById("displayPass").innerText = pass;
+        document.getElementById("generatedPassContainer").style.display =
+          "block";
+      };
+    </script>
+  </body>
+</html>
