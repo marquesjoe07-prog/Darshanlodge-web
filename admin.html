@@ -49,12 +49,12 @@
     <div class="top-nav">
         <div class="nav-logo">DARSHAN ADMIN</div>
         <div class="nav-btns">
-            <button class="btn-gold" onclick="openSubAdminModal()">➕ Admin</button>
             <button class="btn-gold" onclick="openProfileModal()">👤 Profile</button>
         </div>
     </div>
 
     <div class="sidebar">
+        <button class="btn-gold" onclick="openSubAdminModal()">➕ Add Sub-Admin</button>
         <button class="btn-gold" onclick="loadApprovals()">📩 Approvals</button>
         <button class="btn-gold" onclick="loadDirectory()">📞 Directory/Manage</button>
         <button class="btn-gold" style="background:var(--green); color:white;" onclick="handleRentAddition()">💸 Add Rent</button>
@@ -73,14 +73,13 @@
     <div class="grid" id="roomContainer"></div>
 
     <footer>
-        ©️ 2026 ALL RIGHTS RESERVED TO DARSHAN LODGE<br>
-        DESIGNED & MANAGED BY OWNER: PDJ
+        ©️ 2026 DARSHAN LODGE | OWNER: PDJ
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, query, getDocs, doc, setDoc, deleteDoc, updateDoc, getDoc, where, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
@@ -138,7 +137,7 @@
             openModal(`Resident Details`, content);
         };
 
-        // --- 3. LEDGER HISTORY (FIXED: SHOWS RECEIVED PAYMENTS) ---
+        // --- 3. LEDGER HISTORY ---
         window.viewHistory = async (uid, name) => {
             const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc"));
             const snap = await getDocs(q);
@@ -152,7 +151,7 @@
             openModal(`Payment Ledger: ${name}`, table);
         };
 
-        // --- 4. DIRECTORY/MANAGE (OLD STYLE W/ MOVE OPTION) ---
+        // --- 4. DIRECTORY/MANAGE ---
         window.loadDirectory = async () => {
             const snap = await getDocs(collection(db, "users"));
             let h = "";
@@ -185,7 +184,7 @@
             }
         };
 
-        // --- 5. RENT ADDITION (FIXED: UPDATES ROOM CARDS) ---
+        // --- 5. RENT ADDITION ---
         window.handleRentAddition = async () => {
             const choice = confirm("Press OK for ALL residents, or CANCEL for one specific resident.");
             const amt = prompt("Enter Rent Amount to add:");
@@ -212,7 +211,7 @@
             location.reload();
         };
 
-        // --- 6. ADMIN PROFILE (REAL-TIME DATA) ---
+        // --- 6. ADMIN PROFILE & LOGOUT (FIXED) ---
         window.openProfileModal = async () => {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -224,14 +223,55 @@
                             <p><b>Name:</b> ${d.name}</p>
                             <p><b>Email:</b> ${d.email}</p>
                             <p><b>Role:</b> Master Admin</p>
-                            <button class="btn-red" style="width:100%; margin-top:20px;" onclick="auth.signOut().then(()=>location.reload())">Logout</button>
+                            <button class="btn-red" style="width:100%; margin-top:20px;" onclick="handleLogout()">Logout</button>
                         </div>
                     `);
                 }
             });
         };
 
-        // --- CORE HELPERS (COLLECT, APPROVE, REPORT) ---
+        window.handleLogout = async () => {
+            if(confirm("Bhai, logout karna chahte ho?")){
+                await signOut(auth);
+                window.location.href = 'index.html';
+            }
+        };
+
+        // --- 7. SUB-ADMIN LOGIC (FULL MANUAL INPUT) ---
+        window.openSubAdminModal = () => {
+            openModal("Add New Sub-Admin", `
+                <p style="font-size:0.8rem; opacity:0.7;">Bhai, details dhyan se bharna.</p>
+                <input type="text" id="subName" placeholder="Full Name">
+                <input type="email" id="subEmail" placeholder="Email Address">
+                <input type="password" id="subPass" placeholder="Set Password">
+                <button class="btn-gold" style="width:100%; margin-top:10px;" onclick="saveSubAdminManual()">✅ Create Admin</button>
+            `);
+        };
+
+        window.saveSubAdminManual = async () => {
+            const n = document.getElementById('subName').value;
+            const e = document.getElementById('subEmail').value;
+            const p = document.getElementById('subPass').value;
+
+            if(!n || !e || !p) return alert("Saari details bharo bhai!");
+            if(p.length < 6) return alert("Password kam se kam 6 characters ka hona chahiye!");
+
+            try {
+                const res = await createUserWithEmailAndPassword(auth, e, p);
+                await setDoc(doc(db, "users", res.user.uid), { 
+                    uid: res.user.uid, 
+                    name: n, 
+                    email: e, 
+                    role: 'sub-admin' 
+                });
+                alert("Sub-Admin ban gaya! Details save ho gayi hain.");
+                location.reload();
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        };
+
+        // --- CORE HELPERS ---
         window.collectPayment = async (uid, due) => {
             const amt = prompt(`Current Due: ₹${due}. Received:`);
             if(!amt || isNaN(amt)) return;
@@ -281,17 +321,13 @@
         };
 
         window.deleteTenant = async (id) => { if(confirm("Confirm Delete?")) { await deleteDoc(doc(db, "users", id)); location.reload(); } };
-        window.openSubAdminModal = () => openModal("New Admin", `<input type="text" id="an" placeholder="Name"><input type="email" id="ae" placeholder="Email"><button class="btn-gold" style="width:100%" onclick="saveSubAdmin()">Create Admin</button>`);
-        window.saveSubAdmin = async () => {
-            const name = document.getElementById('an').value;
-            const email = document.getElementById('ae').value;
-            await createUserWithEmailAndPassword(auth, email, "lodge123");
-            await setDoc(doc(db, "users", auth.currentUser.uid), { uid: auth.currentUser.uid, name, email, role: 'sub-admin' });
-            location.reload();
-        };
-
+        
         window.closeModal = () => document.getElementById('modal').style.display = 'none';
-        const openModal = (t, c) => { document.getElementById('modalTitle').innerText = t; document.getElementById('modalContent').innerHTML = c; document.getElementById('modal').style.display = 'block'; };
+        const openModal = (t, c) => {
+            document.getElementById('modalTitle').innerText = t;
+            document.getElementById('modalContent').innerHTML = c;
+            document.getElementById('modal').style.display = 'block';
+        };
 
         loadRooms();
     </script>
