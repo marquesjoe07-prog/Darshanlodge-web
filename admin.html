@@ -71,14 +71,14 @@
         const auth = getAuth(app);
 
        // --- 1. Load Approvals with Reject Button ---
-window.loadApprovals = async () => {
-    const q = query(collection(db, "pending_requests"));
-    const snap = await getDocs(q);
-    let html = "";
-    snap.forEach(d => {
-        const data = d.data();
-        html += `
-        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--gold);">
+        window.loadApprovals = async () => {
+          const q = query(collection(db, "pending_requests"));
+          const snap = await getDocs(q);
+           let html = "";
+        snap.forEach(d => {
+          const data = d.data();
+          html += `
+         <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--gold);">
             <p><strong>${data.name}</strong> (${data.email})</p>
             <img src="${data.aadharPhoto}" style="width:100px; border-radius:5px; margin-bottom:10px;">
             <div style="display:flex; gap:10px;">
