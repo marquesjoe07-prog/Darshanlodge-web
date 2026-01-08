@@ -7,71 +7,66 @@
     <style>
         :root { --gold: #d4af37; --glass: rgba(255, 255, 255, 0.1); }
         body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .glass-card { background: var(--glass); backdrop-filter: blur(15px); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; width: 350px; }
-        .role-box { display: flex; gap: 15px; margin-top: 20px; }
-        .role-btn { flex: 1; padding: 20px; border: 1px solid var(--gold); border-radius: 15px; cursor: pointer; transition: 0.3s; }
-        .role-btn:hover { background: var(--gold); color: black; }
+        .glass-card { background: var(--glass); backdrop-filter: blur(15px); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 400px; text-align: center; }
         input { width: 100%; padding: 12px; margin: 8px 0; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; box-sizing: border-box; }
-        .btn-gold { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 8px; color: black; font-weight: bold; cursor: pointer; }
+        .btn-gold { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 8px; color: black; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div class="glass-card" id="portal">
+    <div class="glass-card" id="mainCard">
         <div id="roleView">
             <h2 style="color: var(--gold);">DARSHAN LODGE</h2>
-            <p>Select Access Role</p>
-            <div class="role-box">
-                <div class="role-btn" onclick="showForm('admin')">🔑<br>Admin</div>
-                <div class="role-btn" onclick="showForm('tenant')">🏠<br>Tenant</div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-gold" style="flex:1" onclick="showAuth('admin')">Admin</button>
+                <button class="btn-gold" style="flex:1" onclick="showAuth('tenant')">Tenant</button>
             </div>
         </div>
 
         <div id="authView" class="hidden">
-            <h3 id="formTitle">Login</h3>
-            <input type="email" id="email" placeholder="Email">
+            <h3 id="authTitle" style="color: var(--gold);">Login</h3>
+            <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="pass" placeholder="Password">
             <button class="btn-gold" onclick="handleLogin()">Sign In</button>
-            <div id="tenantOptions" class="hidden">
-                <p onclick="showSignup()" style="cursor:pointer; font-size: 0.8rem; margin-top:10px;">New Resident? Register Here</p>
-            </div>
-            <p onclick="location.reload()" style="cursor:pointer; font-size: 0.8rem; opacity: 0.5;">← Back</p>
+            <p id="signupLink" class="hidden" onclick="showSignup()" style="cursor:pointer; font-size:0.8rem; text-decoration:underline;">New Tenant? Sign Up</p>
+            <p onclick="location.reload()" style="cursor:pointer; opacity:0.5; font-size:0.8rem;">← Back</p>
         </div>
 
         <div id="signupView" class="hidden">
-            <h3>Registration</h3>
+            <h3 style="color: var(--gold);">Registration</h3>
             <input type="text" id="sName" placeholder="Full Name">
+            <input type="email" id="sEmail" placeholder="Login Email">
+            <input type="password" id="sPass" placeholder="Login Password">
             <input type="tel" id="sPhone" placeholder="Mobile Number">
             <input type="tel" id="sParent" placeholder="Parent Number">
+            <label style="font-size:0.7rem; display:block; margin-top:5px;">Aadhar Upload (<50kb Auto)</label>
             <input type="file" id="sAadhar" accept="image/*">
-            <button class="btn-gold" onclick="processSignup()">Submit Request</button>
+            <button class="btn-gold" onclick="submitSignup()">Request Approval</button>
+            <p onclick="location.reload()" style="cursor:pointer; opacity:0.5; font-size:0.8rem;">← Back</p>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { 
-          apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
-          authDomain: "darshan-lodge-16d22.firebaseapp.com",
-          projectId: "darshan-lodge-16d22",
-          storageBucket: "darshan-lodge-16d22.firebasestorage.app",
-          messagingSenderId: "834416173936",
-          appId: "1:834416173936:web:c6e62b396e5072f3e7e5b5"
-           };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
+            authDomain: "darshan-lodge-16d22.firebaseapp.com",
+            projectId: "darshan-lodge-16d22",
+            storageBucket: "darshan-lodge-16d22.firebasestorage.app",
+            messagingSenderId: "834416173936",
+            appId: "1:834416173936:web:c6e62b396e5072f3e7e5b5"
+        };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentRole = '';
-
-        window.showForm = (role) => {
-            currentRole = role;
+        window.showAuth = (role) => {
             document.getElementById('roleView').classList.add('hidden');
             document.getElementById('authView').classList.remove('hidden');
-            if(role === 'tenant') document.getElementById('tenantOptions').classList.remove('hidden');
+            if(role === 'tenant') document.getElementById('signupLink').classList.remove('hidden');
         };
 
         window.showSignup = () => {
@@ -83,28 +78,36 @@
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
             try {
-                const cred = await signInWithEmailAndPassword(auth, e, p);
-                const snap = await getDoc(doc(db, "users", cred.user.uid));
+                const res = await signInWithEmailAndPassword(auth, e, p);
+                const snap = await getDoc(doc(db, "users", res.user.uid));
                 if(snap.exists()) {
                     window.location.href = snap.data().role === 'admin' ? 'admin.html' : 'tenant.html';
                 }
             } catch(err) { alert(err.message); }
         };
 
-        window.processSignup = async () => {
+        window.submitSignup = async () => {
             const file = document.getElementById('sAadhar').files[0];
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async (e) => {
-                const img = new Image();
-                img.src = e.target.result;
+                const img = new Image(); img.src = e.target.result;
                 img.onload = async () => {
                     const canvas = document.createElement('canvas');
                     canvas.width = 400; canvas.height = (img.height/img.width)*400;
                     canvas.getContext('2d').drawImage(img, 0, 0, 400, canvas.height);
-                    const compressed = canvas.toDataURL('image/jpeg', 0.5);
-                    // Submit to 'pending_requests' collection
-                    alert("Application Submitted for Approval!");
+                    const compressedImg = canvas.toDataURL('image/jpeg', 0.5); //
+                    
+                    await addDoc(collection(db, "pending_requests"), {
+                        name: document.getElementById('sName').value,
+                        email: document.getElementById('sEmail').value,
+                        pass: document.getElementById('sPass').value,
+                        phone: document.getElementById('sPhone').value,
+                        parent: document.getElementById('sParent').value,
+                        aadhar: compressedImg,
+                        status: 'pending'
+                    });
+                    alert("Application Sent! Contact Admin.");
                     location.reload();
                 };
             };
