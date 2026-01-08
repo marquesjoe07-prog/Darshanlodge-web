@@ -70,36 +70,60 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // --- 1. Load Approvals ---
-        window.loadApprovals = async () => {
-            const q = query(collection(db, "pending_requests"));
-            const snap = await getDocs(q);
-            let html = "";
-            snap.forEach(d => {
-                const data = d.data();
-                html += `<div class="tenant-row">
-                    <p><strong>${data.name}</strong> (${data.email})</p>
-                    <img src="${data.aadharPhoto}" style="width:100px; border-radius:5px; border:1px solid var(--gold)">
-                    <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.pass}', '${data.phone}', '${data.parent}')">Approve</button>
-                </div>`;
-            });
-            openModal("Pending Approvals", html || "No pending requests.");
-        };
+       // --- 1. Load Approvals with Reject Button ---
+window.loadApprovals = async () => {
+    const q = query(collection(db, "pending_requests"));
+    const snap = await getDocs(q);
+    let html = "";
+    snap.forEach(d => {
+        const data = d.data();
+        html += `
+        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--gold);">
+            <p><strong>${data.name}</strong> (${data.email})</p>
+            <img src="${data.aadharPhoto}" style="width:100px; border-radius:5px; margin-bottom:10px;">
+            <div style="display:flex; gap:10px;">
+                <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.phone}', '${data.parent}')">Approve</button>
+                <button class="btn-red" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;" 
+                    onclick="rejectUser('${d.id}', '${data.name}')">Reject</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById('modalTitle').innerText = "Pending Approvals";
+    document.getElementById('modalContent').innerHTML = html || "No pending requests.";
+    document.getElementById('modal').style.display = 'block';
+};
 
-        window.approveUser = async (id, name, email, pass, phone, parent) => {
-            const room = prompt("Room (1-4):");
-            const bed = prompt("Bed (1-2):");
-            if(!room || !bed) return;
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "users", userCredential.user.uid), {
-                    name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0, status: 'active'
-                });
-                await deleteDoc(doc(db, "pending_requests", id));
-                alert("Account Activated!");
-                location.reload();
-            } catch(e) { alert(e.message); }
-        };
+// --- 2. Correct Approve Logic (No Duplicate Auth Error) ---
+window.approveUser = async (uid, name, email, phone, parent) => {
+    const room = prompt("Enter Room No (1-4):");
+    const bed = prompt("Enter Bed No (1-2):");
+    if(!room || !bed) return;
+
+    try {
+        // Sirf Firestore mein profile banayenge kyunki Auth Signup waqt ban chuka hai
+        await setDoc(doc(db, "users", uid), {
+            uid: uid,
+            name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0, status: 'active'
+        });
+        await deleteDoc(doc(db, "pending_requests", uid));
+        alert(`${name} is now Active!`);
+        location.reload();
+    } catch(e) { alert("Error: " + e.message); }
+};
+
+// --- 3. Reject Logic (Delete from Pending) ---
+window.rejectUser = async (uid, name) => {
+    if(confirm(`Are you sure you want to REJECT and DELETE ${name}'s request?`)) {
+        try {
+            // Pending request se delete karein
+            await deleteDoc(doc(db, "pending_requests", uid));
+            // Note: Auth account manually Firebase console se delete karna padega 
+            // ya fir security ke liye use 'rejected' status de sakte hain.
+            alert("Request Rejected and Removed.");
+            location.reload();
+        } catch(e) { alert("Reject Error: " + e.message); }
+    }
+};
 
         // --- 2. Directory & Management (Delete/Room Change) ---
         window.loadDirectory = async () => {
