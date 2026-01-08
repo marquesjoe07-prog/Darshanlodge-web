@@ -6,63 +6,104 @@
     <title>Admin - Darshan Lodge</title>
     <style>
         :root { --gold: #d4af37; --blue-glass: rgba(0, 122, 255, 0.15); }
-        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-        
-        /* Fixed Header for Mobile */
-        .top-nav { position: fixed; top: 0; width: 100%; height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1); }
-
-        /* Main Container: Mobile me Sidebar upar aur Grid niche ho jayega */
-        .container { display: flex; flex-direction: column; padding-top: 70px; padding-bottom: 80px; }
-
-        /* Sidebar - Mobile me horizontal scroll ya list ban jayega */
-        .sidebar { padding: 15px; background: rgba(255,255,255,0.03); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        
-        /* Grid - Mobile me 1 column, Tablet me 2 column */
-        .main { padding: 15px; }
-        .room-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        @media (min-width: 600px) { .room-grid { grid-template-columns: repeat(2, 1fr); } }
-
+        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; }
+        .top-nav { height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
+        .sidebar { padding: 80px 15px 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; background: rgba(255,255,255,0.03); }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; padding: 15px; }
+        @media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
         .room-card { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
-
-        /* Buttons */
-        .btn-circle { position: absolute; left: 15px; width: 35px; height: 35px; border-radius: 50%; background: var(--gold); border: none; }
-        .btn-square { position: absolute; right: 15px; width: 35px; height: 35px; background: rgba(255,255,255,0.1); border: 1px solid white; border-radius: 5px; }
-        .nav-link { font-size: 0.8rem; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; cursor: pointer; }
-
-        /* Bottom Bar */
-        .revenue-bar { position: fixed; bottom: 0; width: 100%; background: rgba(0,122,255,0.25); backdrop-filter: blur(15px); padding: 15px; border-top: 1px solid rgba(0,122,255,0.3); text-align: center; box-sizing: border-box; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 200; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: #001529; padding: 20px; border-radius: 15px; border: 1px solid var(--gold); max-width: 500px; margin: auto; }
+        .btn-gold { background: var(--gold); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <div class="top-nav">
-        <button class="btn-circle">➕</button>
-        <span style="font-weight:bold; font-size:0.9rem; letter-spacing:1px;">ADMIN DASHBOARD</span>
-        <button class="btn-square">👤</button>
+        <button class="btn-gold" style="border-radius:50%;" onclick="addAdmin()">➕</button>
+        <span style="font-weight:bold;">ADMIN PANEL</span>
+        <button class="btn-gold" style="border-radius:5px;" onclick="showProfile()">👤</button>
     </div>
 
-    <div class="container">
-        <div class="sidebar">
-            <button class="nav-link">📜 Rules</button>
-            <button class="nav-link">📩 Approvals</button>
-            <button class="nav-link">📞 Directory</button>
-            <button class="nav-link" style="color:#ff6b6b">⚠️ Unpaid</button>
-        </div>
+    <div class="sidebar">
+        <button class="btn-gold" onclick="loadApprovals()">📩 Approvals</button>
+        <button class="btn-gold" onclick="loadDirectory()">📞 Directory</button>
+        <button class="btn-gold" style="background:#ff6b6b" onclick="alert('Defaulters coming soon')">⚠️ Defaulters</button>
+    </div>
 
-        <div class="main">
-            <div class="room-grid">
-                <div class="room-card"><h3>Room 1</h3><p>Empty</p></div>
-                <div class="room-card"><h3>Room 2</h3><p>Empty</p></div>
-                <div class="room-card"><h3>Room 3</h3><p>Empty</p></div>
-                <div class="room-card"><h3>Room 4</h3><p>Empty</p></div>
-            </div>
+    <div id="modal" class="modal">
+        <div class="modal-box">
+            <h3 id="modalTitle">Title</h3>
+            <div id="modalContent"></div>
+            <button class="btn-gold" style="width:100%; margin-top:15px;" onclick="document.getElementById('modal').style.display='none'">Close</button>
         </div>
     </div>
 
-    <div class="revenue-bar">
-        <div style="font-size:0.9rem;">Total Monthly: <strong style="color:#2ecc71">₹ 0.00</strong></div>
-        <button style="margin-top:8px; background:#e74c3c; color:white; border:none; padding:5px 12px; border-radius:4px; font-size:0.7rem;">Monthly Reset</button>
+    <div class="grid">
+        <div class="room-card"><h3>Room 1</h3><div id="r1">Empty</div></div>
+        <div class="room-card"><h3>Room 2</h3><div id="r2">Empty</div></div>
+        <div class="room-card"><h3>Room 3</h3><div id="r3">Empty</div></div>
+        <div class="room-card"><h3>Room 4</h3><div id="r4">Empty</div></div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, collection, query, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
+            authDomain: "darshan-lodge-16d22.firebaseapp.com",
+            projectId: "darshan-lodge-16d22",
+            storageBucket: "darshan-lodge-16d22.firebasestorage.app",
+            messagingSenderId: "834416173936",
+            appId: "1:834416173936:web:c6e62b396e5072f3e7e5b5"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); // Note: Admin must be logged in to create users in foreground
+
+        window.loadApprovals = async () => {
+            const q = query(collection(db, "pending_requests"));
+            const snap = await getDocs(q);
+            let html = "";
+            snap.forEach(d => {
+                const data = d.data();
+                html += `<div style="border:1px solid #333; padding:10px; margin-bottom:10px;">
+                    <p><strong>${data.name}</strong><br>ID Photo available</p>
+                    <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.pass}', '${data.phone}', '${data.parent}')">Approve</button>
+                </div>`;
+            });
+            document.getElementById('modalTitle').innerText = "Pending Approvals";
+            document.getElementById('modalContent').innerHTML = html || "No pending requests.";
+            document.getElementById('modal').style.display = 'block';
+        };
+
+        window.approveUser = async (id, name, email, pass, phone, parent) => {
+            const room = prompt("Room (1-4):");
+            const bed = prompt("Bed (1-2):");
+            if(!room || !bed) return;
+            try {
+                //
+                // 1. Create Auth Account (Simulated or via Admin SDK)
+                // For direct client side, we store the pre-approved user data
+                await setDoc(doc(db, "users", email.replace('.', '_')), {
+                    name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0
+                });
+                await deleteDoc(doc(db, "pending_requests", id));
+                alert("Tenant Approved!");
+                location.reload();
+            } catch(e) { alert(e.message); }
+        };
+
+        window.loadDirectory = async () => {
+            const snap = await getDocs(query(collection(db, "users")));
+            let list = ""; snap.forEach(d => { 
+                const data = d.data();
+                if(data.role === 'tenant') list += `<p>${data.name}: ${data.phone}</p>`;
+            });
+            document.getElementById('modalContent').innerHTML = list;
+            document.getElementById('modal').style.display = 'block';
+        };
+    </script>
 </body>
 </html>
