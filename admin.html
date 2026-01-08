@@ -5,59 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Admin - Darshan Lodge</title>
     <style>
-        :root { --gold: #d4af37; --red: #ff4d4d; --green: #2ecc71; --blue-glass: rgba(0, 122, 255, 0.15); }
-        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-top: 70px; }
+        :root { --gold: #d4af37; --red: #ff4d4d; --green: #2ecc71; --blue: #3498db; --dark: #000a1a; --gold-glow: rgba(212, 175, 55, 0.3); }
+        body { margin: 0; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-top: 75px; display: flex; flex-direction: column; }
         
         /* Navigation */
-        .top-nav { height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
-        .sidebar { padding: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; background: rgba(255,255,255,0.03); margin-bottom: 10px; }
+        .top-nav { height: 65px; background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
+        .sidebar { padding: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; background: rgba(212, 175, 55, 0.05); border-bottom: 1px solid var(--gold-glow); }
         
-        /* Room Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; padding: 15px; }
-        .room-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .room-card:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; flex: 1; }
+        .room-card { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; position: relative; }
+        .room-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .room-card h3 { margin-top: 0; color: var(--gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         
         /* Modal System */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 200; overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: #001529; padding: 25px; border-radius: 20px; border: 1px solid var(--gold); max-width: 500px; margin: auto; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 200; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: #001529; padding: 30px; border-radius: 25px; border: 1px solid var(--gold); max-width: 550px; margin: 40px auto; box-shadow: 0 0 30px var(--gold-glow); }
+        .btn-gold { background: var(--gold); border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; color: black; font-weight: bold; transition: 0.2s; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-gold:hover { transform: scale(1.05); }
+        .btn-red { background: var(--red); color: white; border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: bold; }
         
-        /* Buttons & Inputs */
-        .btn-gold { background: var(--gold); border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; color: black; font-weight: bold; }
-        .btn-red { background: var(--red); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .history-table th, .history-table td { padding: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: left; font-size: 0.85rem; }
+        .history-table th { color: var(--gold); background: rgba(255,255,255,0.05); }
+
+        .tenant-item { background: rgba(255,255,255,0.08); padding: 12px; margin-top: 10px; border-radius: 10px; cursor: pointer; border-left: 5px solid var(--gold); }
+        .aadhar-view { width: 100%; max-width: 200px; border-radius: 10px; cursor: pointer; border: 2px solid var(--gold); margin-top: 12px; transition: 0.3s; display: block; }
         input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; box-sizing: border-box; }
-        
-        .tenant-item { background: rgba(255,255,255,0.1); padding: 10px; margin-top: 8px; border-radius: 8px; cursor: pointer; border-left: 4px solid var(--gold); }
-        .manage-row { border-bottom: 1px solid #333; padding: 12px 0; display: flex; flex-direction: column; gap: 8px; }
+        footer { text-align: center; padding: 25px; font-size: 0.75rem; opacity: 0.5; color: var(--gold); letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
         <button class="btn-gold" onclick="openSubAdminModal()">➕ Admin</button>
-        <span style="font-weight:bold; color:var(--gold); letter-spacing: 1px;">DARSHAN ADMIN</span>
+        <span style="font-weight:900; color:var(--gold); letter-spacing: 2px; font-size: 1.1rem;">DARSHAN ADMIN</span>
         <button class="btn-gold" onclick="openProfileModal()">👤 Profile</button>
     </div>
 
     <div class="sidebar">
         <button class="btn-gold" onclick="loadApprovals()">📩 Approvals</button>
-        <button class="btn-gold" onclick="loadDirectory()">📞 Manage Users</button>
-        <button class="btn-gold" style="background:#2ecc71; color:white;" onclick="applyMonthlyRent()">💸 Add Rent</button>
+        <button class="btn-gold" onclick="loadDirectory()">📞 Directory</button>
+        <button class="btn-gold" style="background:var(--green); color:white;" onclick="applyMonthlyRent()">💸 Add Rent</button>
+        <button class="btn-gold" style="background:var(--blue); color:white;" onclick="calculateMonthlyCollection()">📊 Monthly Report</button>
+        <button class="btn-red" onclick="resetMonthFull()">🔄 Reset Month & Total</button>
     </div>
 
     <div id="modal" class="modal">
         <div class="modal-box">
-            <h3 id="modalTitle" style="color:var(--gold)">Title</h3>
+            <h2 id="modalTitle" style="color:var(--gold); margin-top: 0;">Title</h2>
             <div id="modalContent"></div>
-            <button class="btn-gold" style="width:100%; margin-top:15px;" onclick="closeModal()">Close</button>
+            <button class="btn-gold" style="width:100%; margin-top:20px; background: #444; color: white;" onclick="closeModal()">Close Panel</button>
         </div>
     </div>
 
-    <div class="grid" id="roomContainer">
-        </div>
+    <div class="grid" id="roomContainer"></div>
+
+    <footer>
+        ©️ 2026 DARSHAN LODGE | ALL RIGHTS RESERVED<br>
+        DESIGNED & MANAGED BY OWNER: PDJ
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, query, getDocs, doc, setDoc, deleteDoc, updateDoc, getDoc, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, query, getDocs, doc, setDoc, deleteDoc, updateDoc, getDoc, where, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -72,7 +83,52 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // --- 1. LOAD ROOM CARDS ---
+        // --- 📊 MONTHLY COLLECTION CALCULATION ---
+        window.calculateMonthlyCollection = async () => {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            // Current Month ki collection fetch karna
+            const q = query(collection(db, "payments"), where("date", ">=", firstDay));
+            const snap = await getDocs(q);
+            
+            let total = 0;
+            snap.forEach(doc => { total += Number(doc.data().amount || 0); });
+
+            const monthName = now.toLocaleString('default', { month: 'long' });
+            const content = `
+                <div style="text-align:center; padding:10px;">
+                    <h2 style="color:var(--green); font-size:2.5rem;">₹${total}</h2>
+                    <p>Total Received in <b>${monthName}</b></p>
+                    <p style="font-size:0.8rem; opacity:0.6;">(Payments received after the 1st of this month)</p>
+                </div>
+            `;
+            openModal("Finance Report", content);
+        };
+
+        // --- 🔄 FULL RESET LOGIC (Due + History View Reset) ---
+        window.resetMonthFull = async () => {
+            const confirm1 = confirm("⚠ DANGER: Kya aap sabhi tenants ka balance ₹0 karna chahte hain?");
+            const confirm2 = confirm("⚠ SECOND CHECK: Kya aap 'Monthly Total Received' ko bhi reset karna chahte hain? (Isse purani payments deleted nahi hongi, bas report naye mahine se shuru hogi)");
+
+            if(confirm1 && confirm2) {
+                try {
+                    // 1. Reset all Tenant Dues
+                    const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
+                    for (const tDoc of snap.docs) {
+                        await updateDoc(doc(db, "users", tDoc.id), { totalDue: 0 });
+                    }
+
+                    // 2. Note: Report Reset automatic hai kyunki calculateMonthlyCollection() 
+                    // date-based hai (humesha current month ka hi dikhayega).
+                    
+                    alert("Month Reset Successful! Sabhi balances ₹0 ho gaye hain aur report naye mahine ke liye taiyaar hai.");
+                    location.reload();
+                } catch (e) { alert("Reset Error: " + e.message); }
+            }
+        };
+
+        // --- LOAD ROOMS ---
         window.loadRooms = async () => {
             const snap = await getDocs(collection(db, "users"));
             const container = document.getElementById('roomContainer');
@@ -82,162 +138,110 @@
                 snap.forEach(d => {
                     const t = d.data();
                     if(t.room == i && t.role == 'tenant') {
-                        tenantsHtml += `<div class="tenant-item" onclick="viewTenantDetail('${d.id}')">${t.name} <br> <small>Due: ₹${t.totalDue}</small></div>`;
+                        tenantsHtml += `<div class="tenant-item" onclick="viewTenantDetail('${d.id}')">
+                            <b>${t.name}</b> <br> <small>Balance: ₹${t.totalDue}</small>
+                        </div>`;
                     }
                 });
-                container.innerHTML += `<div class="room-card"><h3>Room ${i}</h3>${tenantsHtml || '<p style="opacity:0.5">Vacant</p>'}</div>`;
+                container.innerHTML += `<div class="room-card"><h3>Room ${i}</h3>${tenantsHtml || '<p style="opacity:0.4">Vacant</p>'}</div>`;
             }
         };
 
-        // --- 2. SUB-ADMIN LOGIC ---
-        window.openSubAdminModal = () => {
-            openModal("Add Sub-Admin", `
-                <input type="text" id="admName" placeholder="Full Name">
-                <input type="email" id="admEmail" placeholder="Email Address">
-                <p style="font-size:0.8rem; opacity:0.6;">Default Password: lodge123</p>
-                <button class="btn-gold" style="width:100%" onclick="saveSubAdmin()">Create Account</button>
-            `);
+        // --- TENANT PROFILE & OPTIONS ---
+        window.viewTenantDetail = async (uid) => {
+            const snap = await getDoc(doc(db, "users", uid));
+            const t = snap.data();
+            const rentMsg = `*Darshan Lodge - Rent Reminder*%0AHello ${t.name},%0AYour outstanding balance is *₹${t.totalDue}*. Please settle it soon.`;
+            let content = `
+                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1);">
+                    <p><b>Name:</b> ${t.name}</p>
+                    <p><b>Contact:</b> ${t.phone}</p>
+                    <p><b>Room/Bed:</b> ${t.room}/${t.bed}</p>
+                    <p style="font-size:1.3rem; color:var(--green)"><b>Due:</b> ₹${t.totalDue}</p>
+                    <img src="${t.aadharPhoto || ''}" class="aadhar-view" onclick="window.open('${t.aadharPhoto}', '_blank')">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">
+                    <button class="btn-gold" style="background:var(--green); color:white;" onclick="collectPayment('${uid}', ${t.totalDue})">Receive</button>
+                    <button class="btn-gold" style="background:var(--blue); color:white;" onclick="viewHistory('${uid}', '${t.name}')">History</button>
+                    <a href="https://wa.me/91${t.phone}?text=${rentMsg}" target="_blank" class="btn-gold" style="background:#25D366; color:white;">💬 WhatsApp</a>
+                </div>
+            `;
+            openModal(`${t.name}'s Profile`, content);
         };
 
-        window.saveSubAdmin = async () => {
-            const name = document.getElementById('admName').value;
-            const email = document.getElementById('admEmail').value;
-            const pass = "lodge123";
-            if(!name || !email) return alert("Bhai, details bhariye!");
-            try {
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, name, email, role: 'sub-admin', status: 'active' });
-                alert(`🎉 Success!\nEmail: ${email}\nPass: ${pass}`);
-                location.reload();
-            } catch (err) { alert(err.message); }
-        };
-
-        // --- 3. MANAGE USERS (Directory/Move/Delete) ---
-        window.loadDirectory = async () => {
-            const snap = await getDocs(collection(db, "users"));
-            let html = "";
-            snap.forEach(d => {
-                const data = d.data();
-                if(data.role === 'tenant') {
-                    html += `<div class="manage-row">
-                        <p><b>${data.name}</b> (R: ${data.room} | B: ${data.bed})</p>
-                        <div style="display:flex; gap:8px;">
-                            <button class="btn-gold" style="padding:5px 10px; font-size:0.8rem;" onclick="changeRoom('${d.id}')">🔄 Move</button>
-                            <button class="btn-red" style="padding:5px 10px; font-size:0.8rem;" onclick="deleteTenant('${d.id}', '${data.name}')">🗑️ Delete</button>
-                        </div>
-                    </div>`;
-                }
+        // --- PAYMENT HISTORY ---
+        window.viewHistory = async (uid, name) => {
+            const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc"));
+            const snap = await getDocs(q);
+            let rows = "";
+            snap.forEach(doc => {
+                const p = doc.data();
+                const d = p.date ? p.date.toDate().toLocaleDateString('en-GB') : 'N/A';
+                rows += `<tr><td>${d}</td><td>${p.type}</td><td style="color:var(--green)">₹${p.amount}</td><td>${p.status}</td></tr>`;
             });
-            openModal("Manage Tenants", html || "No tenants.");
+            let table = `<div style="overflow-x:auto;"><table class="history-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No records.</td></tr>'}</tbody></table></div>`;
+            openModal(`Ledger: ${name}`, table);
         };
 
-        window.changeRoom = async (uid) => {
-            const r = prompt("New Room (1-4):");
-            const b = prompt("New Bed (1-2):");
-            if(r && b) {
-                await updateDoc(doc(db, "users", uid), { room: r, bed: b });
-                alert("Room Changed!");
-                location.reload();
-            }
-        };
-
-        window.deleteTenant = async (uid, name) => {
-            if(confirm(`Delete ${name} permanently?`)) {
-                await deleteDoc(doc(db, "users", uid));
-                location.reload();
-            }
-        };
-
-        // --- 4. APPROVALS ---
+        // --- APPROVALS ---
         window.loadApprovals = async () => {
             const snap = await getDocs(collection(db, "pending_requests"));
             let html = "";
             snap.forEach(d => {
                 const data = d.data();
-                html += `<div style="border-bottom:1px solid #333; padding:10px; margin-bottom:10px;">
-                    <p><b>${data.name}</b> (${data.email})</p>
-                    <img src="${data.aadharPhoto}" style="width:100px; border-radius:5px; margin-bottom:10px;"> <br>
-                    <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.phone}', '${data.parent}')">Approve</button>
-                    <button class="btn-red" onclick="rejectUser('${d.id}')">Reject</button>
-                </div>`;
+                html += `
+                    <div style="border-bottom:1px solid #333; padding:15px 0;">
+                        <p><b>${data.name}</b></p>
+                        <img src="${data.aadharPhoto}" class="aadhar-view" onclick="window.open('${data.aadharPhoto}', '_blank')">
+                        <button class="btn-gold" onclick="approveUser('${d.id}','${data.name}','${data.email}','${data.phone}','${data.parent}','${data.aadharPhoto}')">Approve</button>
+                    </div>`;
             });
-            openModal("Pending Approvals", html || "No requests.");
+            openModal("Pending Approvals", html || "All clear!");
         };
 
-        window.approveUser = async (uid, name, email, phone, parent) => {
-            const room = prompt("Room No (1-4):");
-            const bed = prompt("Bed No (1-2):");
-            if(!room || !bed) return;
-            try {
-                await setDoc(doc(db, "users", uid), { uid, name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0, status: 'active' });
-                await deleteDoc(doc(db, "pending_requests", uid));
-                alert("Approved!");
-                location.reload();
-            } catch(e) { alert(e.message); }
-        };
-
-        window.rejectUser = async (uid) => {
-            if(confirm("Reject this request?")) {
-                await deleteDoc(doc(db, "pending_requests", uid));
-                location.reload();
-            }
-        };
-
-        // --- 5. RENT & PAYMENTS ---
-        window.applyMonthlyRent = async () => {
-            const amt = prompt("Enter Monthly Rent Amount:");
-            if(!amt || isNaN(amt)) return;
-            if(confirm(`Add ₹${amt} to all tenants?`)) {
-                const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
-                const updates = [];
-                snap.forEach(tDoc => {
-                    const newDue = (Number(tDoc.data().totalDue) || 0) + Number(amt);
-                    updates.push(updateDoc(doc(db, "users", tDoc.id), { totalDue: newDue }));
-                });
-                await Promise.all(updates);
-                alert("Rent Added!");
-                location.reload();
-            }
-        };
-
-        window.viewTenantDetail = async (uid) => {
-            const snap = await getDoc(doc(db, "users", uid));
-            const t = snap.data();
-            openModal(`Details: ${t.name}`, `
-                <p><b>Phone:</b> ${t.phone}</p>
-                <p><b>Room/Bed:</b> ${t.room} / ${t.bed}</p>
-                <p><b>Balance Due:</b> ₹${t.totalDue}</p>
-                <button class="btn-gold" style="width:100%; background:var(--green); color:white" onclick="collectPayment('${uid}', ${t.totalDue})">Receive Payment</button>
-            `);
-        };
-
-        window.collectPayment = async (uid, due) => {
-            const amt = prompt(`Current Due: ₹${due}. Received amount:`);
-            if(!amt || isNaN(amt)) return;
-            await updateDoc(doc(db, "users", uid), { totalDue: due - Number(amt) });
-            alert("Payment Recorded!");
+        window.approveUser = async (uid, n, e, p, pr, photo) => {
+            const r = prompt("Room (1-4):"), b = prompt("Bed (1-2):");
+            if(!r || !b) return;
+            await setDoc(doc(db, "users", uid), { uid, name: n, email: e, phone: p, parentPhone: pr, room: r, bed: b, role: 'tenant', totalDue: 0, aadharPhoto: photo });
+            await deleteDoc(doc(db, "pending_requests", uid));
             location.reload();
         };
 
-        // --- 6. PROFILE ---
-        window.openProfileModal = async () => {
-            onAuthStateChanged(auth, async (user) => {
-                if(user) {
-                    const snap = await getDoc(doc(db, "users", user.uid));
-                    const d = snap.data();
-                    openModal("Admin Profile", `<p><b>Name:</b> ${d.name}</p><p><b>Email:</b> ${d.email}</p><p><b>Role:</b> ${d.role.toUpperCase()}</p>`);
-                }
-            });
+        window.collectPayment = async (uid, due) => {
+            const amt = prompt("Amount Received:");
+            if(!amt || isNaN(amt)) return;
+            await updateDoc(doc(db, "users", uid), { totalDue: due - Number(amt) });
+            await addDoc(collection(db, "payments"), { tenantId: uid, amount: Number(amt), type: "Manual", status: "Success", date: serverTimestamp() });
+            location.reload();
         };
 
-        // UI HELPERS
-        const openModal = (title, html) => {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalContent').innerHTML = html;
-            document.getElementById('modal').style.display = 'block';
+        window.applyMonthlyRent = async () => {
+            const amt = prompt("Amount to add to all residents:");
+            if(!amt || isNaN(amt)) return;
+            const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
+            for (const tDoc of snap.docs) {
+                await updateDoc(doc(db, "users", tDoc.id), { totalDue: (Number(tDoc.data().totalDue) || 0) + Number(amt) });
+            }
+            alert("Updated!"); location.reload();
         };
+
+        window.loadDirectory = async () => {
+            const snap = await getDocs(collection(db, "users"));
+            let h = "";
+            snap.forEach(d => { if(d.data().role === 'tenant') h += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${d.data().name}</span><button class="btn-red" onclick="deleteTenant('${d.id}')">Delete</button></div>`; });
+            openModal("Directory", h);
+        };
+
+        window.deleteTenant = async (id) => { if(confirm("Delete?")) { await deleteDoc(doc(db, "users", id)); location.reload(); } };
+        window.openSubAdminModal = () => openModal("New Admin", `<input type="text" id="an" placeholder="Name"><input type="email" id="ae" placeholder="Email"><button class="btn-gold" style="width:100%" onclick="saveSubAdmin()">Create</button>`);
+        window.saveSubAdmin = async () => {
+            const res = await createUserWithEmailAndPassword(auth, document.getElementById('ae').value, "lodge123");
+            await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, name: document.getElementById('an').value, email: document.getElementById('ae').value, role: 'sub-admin' });
+            location.reload();
+        };
+
         window.closeModal = () => document.getElementById('modal').style.display = 'none';
-
+        const openModal = (t, c) => { document.getElementById('modalTitle').innerText = t; document.getElementById('modalContent').innerHTML = c; document.getElementById('modal').style.display = 'block'; };
         loadRooms();
     </script>
 </body>
