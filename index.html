@@ -93,16 +93,19 @@ import {
                 const res = await signInWithEmailAndPassword(auth, e, p);
                 const snap = await getDoc(doc(db, "users", res.user.uid));
                 // index.html ke handleLogin function ke andar
-               if(snap.exists()) {
-                const userData = snap.data();
-               if(userData.role === 'admin') {
-               window.location.href = 'admin.html';
+              if(snap.exists()) {
+                    const userData = snap.data();
+                    if(userData.role === 'admin' || userData.role === 'sub-admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'tenant.html'; 
+                    }
                 } else {
-        // Yahan check karein ki file ka naam sahi hai
-              window.location.href = 'tenant.html'; 
-             }
-
-            } catch(err) { alert(err.message); }
+                    alert("Aapki profile nahi mili. Admin approval ka wait karein.");
+                }
+            } catch(err) { 
+                alert("Login Error: " + err.message); 
+            }
         };
 
         // --- Updated Signup Logic with Image Compression ---
