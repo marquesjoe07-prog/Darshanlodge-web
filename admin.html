@@ -60,7 +60,7 @@
         };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app); // Note: Admin must be logged in to create users in foreground
+        const auth = getAuth(app);
 
         window.loadApprovals = async () => {
             const q = query(collection(db, "pending_requests"));
@@ -69,8 +69,8 @@
             snap.forEach(d => {
                 const data = d.data();
                 html += `<div style="border:1px solid #333; padding:10px; margin-bottom:10px;">
-                    <p><strong>${data.name}</strong><br>ID Photo available</p>
-                    <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.pass}', '${data.phone}', '${data.parent}')">Approve</button>
+                    <p><strong>${data.name}</strong> (${data.email})</p>
+                    <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.pass}', '${data.phone}', '${data.parent}')">Approve & Create Account</button>
                 </div>`;
             });
             document.getElementById('modalTitle').innerText = "Pending Approvals";
@@ -82,26 +82,38 @@
             const room = prompt("Room (1-4):");
             const bed = prompt("Bed (1-2):");
             if(!room || !bed) return;
+
             try {
-                //
-                // 1. Create Auth Account (Simulated or via Admin SDK)
-                // For direct client side, we store the pre-approved user data
-                await setDoc(doc(db, "users", email.replace('.', '_')), {
+                // 1. Create real Auth Account so they can login
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = userCredential.user;
+
+                // 2. Save tenant profile with their UID
+                await setDoc(doc(db, "users", user.uid), {
                     name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0
                 });
+
+                // 3. Cleanup pending request
                 await deleteDoc(doc(db, "pending_requests", id));
-                alert("Tenant Approved!");
+                
+                alert(`Account Created for ${name}! They can login now.`);
                 location.reload();
-            } catch(e) { alert(e.message); }
+            } catch(e) { 
+                alert("Approval Failed: " + e.message); 
+            }
         };
 
         window.loadDirectory = async () => {
             const snap = await getDocs(query(collection(db, "users")));
-            let list = ""; snap.forEach(d => { 
+            let list = ""; 
+            snap.forEach(d => { 
                 const data = d.data();
-                if(data.role === 'tenant') list += `<p>${data.name}: ${data.phone}</p>`;
+                if(data.role === 'tenant') {
+                    list += `<p>🏠 Room ${data.room} - Bed ${data.bed}: <strong>${data.name}</strong> (${data.phone})</p>`;
+                }
             });
-            document.getElementById('modalContent').innerHTML = list;
+            document.getElementById('modalTitle').innerText = "Directory";
+            document.getElementById('modalContent').innerHTML = list || "No tenants found.";
             document.getElementById('modal').style.display = 'block';
         };
     </script>
