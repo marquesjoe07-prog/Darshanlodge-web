@@ -5,58 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tenant Portal - Darshan Lodge</title>
     <style>
-        :root { --gold: #d4af37; --blue-glass: rgba(0, 122, 255, 0.15); --dark: #000a1a; --gold-glow: rgba(212, 175, 55, 0.3); }
+        :root { --gold: #d4af37; --blue-glass: rgba(0, 122, 255, 0.15); --dark: #000a1a; }
         body { margin: 0; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
         
         /* Top Navigation */
-        .top-nav { height: 70px; background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
+        .top-nav { height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
         
-        /* Profile Icon Style */
-        .avatar-circle { width: 40px; height: 40px; background: linear-gradient(45deg, var(--gold), #f9e297); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px var(--gold-glow); transition: 0.3s; }
-        .avatar-circle:hover { transform: scale(1.1); }
+        .container { padding: 80px 20px 20px; max-width: 500px; margin: auto; }
 
-        .container { padding: 100px 20px 20px; max-width: 500px; margin: auto; }
-
-        /* Big Branding */
-        .lodge-banner { text-align: center; margin-bottom: 30px; }
-        .lodge-banner h1 { font-size: 2.5rem; color: var(--gold); margin: 0; letter-spacing: 2px; text-shadow: 0 0 15px var(--gold-glow); }
-
-        /* Rent Card */
-        .due-card { background: var(--blue-glass); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
-        .due-card h1 { font-size: 3.5rem; margin: 10px 0; color: white; font-weight: 800; }
+        /* Rent Card - Rolling Debt Feature */
+        .due-card { background: var(--blue-glass); border: 1px solid rgba(0,122,255,0.3); border-radius: 20px; padding: 30px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .due-card h1 { font-size: 3rem; margin: 10px 0; color: #66b2ff; }
         .room-tag { background: var(--gold); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
 
         /* History Table */
-        .section-title { font-size: 1.1rem; color: var(--gold); margin-bottom: 15px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .section-title { font-size: 1.1rem; color: var(--gold); margin-bottom: 15px; display: block; }
         .history-box { background: rgba(255,255,255,0.03); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: rgba(255,255,255,0.05); text-align: left; padding: 12px; font-size: 0.8rem; opacity: 0.7; color: var(--gold); }
+        th { background: rgba(255,255,255,0.05); text-align: left; padding: 12px; font-size: 0.8rem; opacity: 0.7; }
         td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        .status-paid { color: #2ecc71; font-weight: bold; }
-        .status-unpaid { color: #ff4d4d; font-weight: bold; }
 
-        /* Profile Modal */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: #001529; padding: 25px; border-radius: 20px; border: 1px solid var(--gold); width: 100%; max-width: 400px; text-align: center; }
-
-        .btn-pay { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 12px; color: black; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 20px; }
-        .logout-btn { background: none; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; margin-top: 15px; }
+        /* Payment Button */
+        .btn-pay { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 12px; color: black; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-pay:hover { transform: scale(1.02); }
+        
+        .logout-btn { background: none; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
-        <span style="font-weight:bold; letter-spacing:1px; color:var(--gold);">TENANT PORTAL</span>
-        <div class="avatar-circle" id="userAvatar" onclick="openProfile()">?</div>
+        <span style="font-weight:bold; letter-spacing:1px; color:var(--gold);">DARSHAN LODGE</span>
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
     </div>
 
     <div class="container">
-        <div class="lodge-banner">
-            <h1>DARSHAN LODGE</h1>
-        </div>
-
         <div style="margin-bottom: 20px;">
-            <h2 id="tenantName" style="margin:0; font-weight: 300;">Welcome!</h2>
+            <h2 id="tenantName" style="margin:0;">Welcome!</h2>
             <p style="opacity:0.6; font-size:0.9rem;">Manage your stay and payments</p>
         </div>
 
@@ -74,33 +59,21 @@
             <table>
                 <thead>
                     <tr>
-                        <th>MONTH / DATE</th>
+                        <th>MONTH</th>
                         <th>AMOUNT</th>
                         <th>STATUS</th>
                     </tr>
                 </thead>
                 <tbody id="historyList">
-                    </tbody>
+                    <tr>
+                        <td colspan="3" style="text-align:center; opacity:0.5;">Loading history...</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
-        <button class="btn-pay" onclick="alert('Opening Payment Gateway...')">Pay Monthly Rent</button>
+        <button class="btn-pay" onclick="alert('Payment Portal Opening...')">Pay Monthly Rent</button>
         <p style="text-align:center; font-size:0.7rem; opacity:0.5; margin-top:15px;">Note: Any unpaid rent will be added to the next month.</p>
-    </div>
-
-    <div id="profileModal" class="modal">
-        <div class="modal-box">
-            <div class="avatar-circle" style="width:60px; height:60px; margin:0 auto 15px; font-size:1.5rem;" id="modalAvatar">?</div>
-            <h3 id="pName" style="color:var(--gold); margin:0;">Name</h3>
-            <p id="pEmail" style="opacity:0.6; margin-bottom:20px;">Email</p>
-            <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
-                <p><b>Phone:</b> <span id="pPhone">--</span></p>
-                <p><b>Guardian:</b> <span id="pParent">--</span></p>
-                <p><b>Allotted:</b> Room <span id="pRoom">--</span> / Bed <span id="pBed">--</span></p>
-            </div>
-            <button class="btn-pay" style="padding:10px;" onclick="closeProfile()">Close</button><br>
-            <button class="logout-btn" onclick="handleLogout()">Logout Session</button>
-        </div>
     </div>
 
     <script type="module">
@@ -108,6 +81,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
             authDomain: "darshan-lodge-16d22.firebaseapp.com",
@@ -121,61 +95,45 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let userData = null;
-
+        // Fetch Tenant Data on Login
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const snap = await getDoc(doc(db, "users", user.uid));
-                if (snap.exists()) {
-                    userData = snap.data();
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Display User Info
+                    document.getElementById('tenantName').innerText = `Hello, ${data.name}!`;
+                    document.getElementById('totalDue').innerText = `₹ ${data.totalDue || 0}`;
+                    document.getElementById('roomNo').innerText = `Room: ${data.room}`;
+                    document.getElementById('bedNo').innerText = `Bed: ${data.bed}`;
                     
-                    // UI Update
-                    const initial = userData.name ? userData.name.charAt(0).toUpperCase() : "U";
-                    document.getElementById('userAvatar').innerText = initial;
-                    document.getElementById('modalAvatar').innerText = initial;
-                    
-                    document.getElementById('tenantName').innerHTML = `Welcome, <span style="color:var(--gold); font-weight:bold;">${userData.name}</span>!`;
-                    document.getElementById('totalDue').innerText = `₹ ${userData.totalDue || 0}`;
-                    document.getElementById('roomNo').innerText = `Room: ${userData.room}`;
-                    document.getElementById('bedNo').innerText = `Bed: ${userData.bed}`;
-                    
-                    // Auto-updating table logic
-                    updateHistory(userData.totalDue);
+                    // Display Placeholder History
+                    loadPlaceholderHistory();
+                } else {
+                    console.log("No such user document!");
                 }
             } else {
-                window.location.href = 'index.html';
+                window.location.href = 'index.html'; // Redirect if not logged in
             }
         });
 
-        function updateHistory(due) {
+        function loadPlaceholderHistory() {
             const list = document.getElementById('historyList');
-            const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            const status = due > 0 ? '<span class="status-unpaid">UNPAID</span>' : '<span class="status-paid">CLEARED</span>';
-            
             list.innerHTML = `
                 <tr>
-                    <td>${date}</td>
-                    <td>₹ ${due}</td>
-                    <td>${status}</td>
+                    <td>January</td>
+                    <td>₹ 0</td>
+                    <td style="color:#2ecc71; font-weight:bold;">CLEARED</td>
                 </tr>
             `;
         }
 
-        window.openProfile = () => {
-            if(!userData) return;
-            document.getElementById('pName').innerText = userData.name;
-            document.getElementById('pEmail').innerText = userData.email;
-            document.getElementById('pPhone').innerText = userData.phone;
-            document.getElementById('pParent').innerText = userData.parentPhone;
-            document.getElementById('pRoom').innerText = userData.room;
-            document.getElementById('pBed').innerText = userData.bed;
-            document.getElementById('profileModal').style.display = 'flex';
-        };
-
-        window.closeProfile = () => document.getElementById('profileModal').style.display = 'none';
-
         window.handleLogout = () => {
-            signOut(auth).then(() => { window.location.href = 'index.html'; });
+            signOut(auth).then(() => {
+                window.location.href = 'index.html';
+            });
         }
     </script>
 </body>
