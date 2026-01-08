@@ -12,18 +12,22 @@
         .top-nav { height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
         .sidebar { padding: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; background: rgba(255,255,255,0.03); margin-bottom: 10px; }
         
-        /* Grid */
+        /* Room Grid */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; padding: 15px; }
         .room-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
         .room-card:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
         
-        /* UI Elements */
+        /* Modal System */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 200; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         .modal-box { background: #001529; padding: 25px; border-radius: 20px; border: 1px solid var(--gold); max-width: 500px; margin: auto; }
+        
+        /* Buttons & Inputs */
         .btn-gold { background: var(--gold); border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; color: black; font-weight: bold; }
         .btn-red { background: var(--red); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; box-sizing: border-box; }
+        
         .tenant-item { background: rgba(255,255,255,0.1); padding: 10px; margin-top: 8px; border-radius: 8px; cursor: pointer; border-left: 4px solid var(--gold); }
+        .manage-row { border-bottom: 1px solid #333; padding: 12px 0; display: flex; flex-direction: column; gap: 8px; }
     </style>
 </head>
 <body>
@@ -68,27 +72,83 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // --- ROOM LOADING LOGIC ---
+        // --- 1. LOAD ROOM CARDS ---
         window.loadRooms = async () => {
             const snap = await getDocs(collection(db, "users"));
             const container = document.getElementById('roomContainer');
             container.innerHTML = "";
-            
             for(let i=1; i<=4; i++) {
                 let tenantsHtml = "";
                 snap.forEach(d => {
                     const t = d.data();
                     if(t.room == i && t.role == 'tenant') {
-                        tenantsHtml += `<div class="tenant-item" onclick="viewTenantDetail('${d.id}')">
-                            ${t.name} <br> <small>Due: ₹${t.totalDue}</small>
-                        </div>`;
+                        tenantsHtml += `<div class="tenant-item" onclick="viewTenantDetail('${d.id}')">${t.name} <br> <small>Due: ₹${t.totalDue}</small></div>`;
                     }
                 });
                 container.innerHTML += `<div class="room-card"><h3>Room ${i}</h3>${tenantsHtml || '<p style="opacity:0.5">Vacant</p>'}</div>`;
             }
         };
 
-        // --- APPROVALS ---
+        // --- 2. SUB-ADMIN LOGIC ---
+        window.openSubAdminModal = () => {
+            openModal("Add Sub-Admin", `
+                <input type="text" id="admName" placeholder="Full Name">
+                <input type="email" id="admEmail" placeholder="Email Address">
+                <p style="font-size:0.8rem; opacity:0.6;">Default Password: lodge123</p>
+                <button class="btn-gold" style="width:100%" onclick="saveSubAdmin()">Create Account</button>
+            `);
+        };
+
+        window.saveSubAdmin = async () => {
+            const name = document.getElementById('admName').value;
+            const email = document.getElementById('admEmail').value;
+            const pass = "lodge123";
+            if(!name || !email) return alert("Bhai, details bhariye!");
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, name, email, role: 'sub-admin', status: 'active' });
+                alert(`🎉 Success!\nEmail: ${email}\nPass: ${pass}`);
+                location.reload();
+            } catch (err) { alert(err.message); }
+        };
+
+        // --- 3. MANAGE USERS (Directory/Move/Delete) ---
+        window.loadDirectory = async () => {
+            const snap = await getDocs(collection(db, "users"));
+            let html = "";
+            snap.forEach(d => {
+                const data = d.data();
+                if(data.role === 'tenant') {
+                    html += `<div class="manage-row">
+                        <p><b>${data.name}</b> (R: ${data.room} | B: ${data.bed})</p>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-gold" style="padding:5px 10px; font-size:0.8rem;" onclick="changeRoom('${d.id}')">🔄 Move</button>
+                            <button class="btn-red" style="padding:5px 10px; font-size:0.8rem;" onclick="deleteTenant('${d.id}', '${data.name}')">🗑️ Delete</button>
+                        </div>
+                    </div>`;
+                }
+            });
+            openModal("Manage Tenants", html || "No tenants.");
+        };
+
+        window.changeRoom = async (uid) => {
+            const r = prompt("New Room (1-4):");
+            const b = prompt("New Bed (1-2):");
+            if(r && b) {
+                await updateDoc(doc(db, "users", uid), { room: r, bed: b });
+                alert("Room Changed!");
+                location.reload();
+            }
+        };
+
+        window.deleteTenant = async (uid, name) => {
+            if(confirm(`Delete ${name} permanently?`)) {
+                await deleteDoc(doc(db, "users", uid));
+                location.reload();
+            }
+        };
+
+        // --- 4. APPROVALS ---
         window.loadApprovals = async () => {
             const snap = await getDocs(collection(db, "pending_requests"));
             let html = "";
@@ -96,9 +156,9 @@
                 const data = d.data();
                 html += `<div style="border-bottom:1px solid #333; padding:10px; margin-bottom:10px;">
                     <p><b>${data.name}</b> (${data.email})</p>
-                    <img src="${data.aadharPhoto}" style="width:100px; border-radius:5px;"> <br>
+                    <img src="${data.aadharPhoto}" style="width:100px; border-radius:5px; margin-bottom:10px;"> <br>
                     <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.phone}', '${data.parent}')">Approve</button>
-                    <button class="btn-red" onclick="rejectUser('${d.id}', '${data.name}')">Reject</button>
+                    <button class="btn-red" onclick="rejectUser('${d.id}')">Reject</button>
                 </div>`;
             });
             openModal("Pending Approvals", html || "No requests.");
@@ -109,85 +169,65 @@
             const bed = prompt("Bed No (1-2):");
             if(!room || !bed) return;
             try {
-                await setDoc(doc(db, "users", uid), {
-                    uid, name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0, status: 'active'
-                });
+                await setDoc(doc(db, "users", uid), { uid, name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0, status: 'active' });
                 await deleteDoc(doc(db, "pending_requests", uid));
                 alert("Approved!");
                 location.reload();
             } catch(e) { alert(e.message); }
         };
 
-        // --- SUB-ADMIN ---
-        window.openSubAdminModal = () => {
-            openModal("Add Sub-Admin", `
-                <input type="text" id="admName" placeholder="Name">
-                <input type="email" id="admEmail" placeholder="Email">
-                <button class="btn-gold" style="width:100%" onclick="saveSubAdmin()">Create Account</button>
-            `);
+        window.rejectUser = async (uid) => {
+            if(confirm("Reject this request?")) {
+                await deleteDoc(doc(db, "pending_requests", uid));
+                location.reload();
+            }
         };
 
-        window.saveSubAdmin = async () => {
-    const name = document.getElementById('admName').value;
-    const email = document.getElementById('admEmail').value;
-    const pass = "lodge123"; // Ye aapka default password hai
+        // --- 5. RENT & PAYMENTS ---
+        window.applyMonthlyRent = async () => {
+            const amt = prompt("Enter Monthly Rent Amount:");
+            if(!amt || isNaN(amt)) return;
+            if(confirm(`Add ₹${amt} to all tenants?`)) {
+                const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
+                const updates = [];
+                snap.forEach(tDoc => {
+                    const newDue = (Number(tDoc.data().totalDue) || 0) + Number(amt);
+                    updates.push(updateDoc(doc(db, "users", tDoc.id), { totalDue: newDue }));
+                });
+                await Promise.all(updates);
+                alert("Rent Added!");
+                location.reload();
+            }
+        };
 
-    if(!name || !email) return alert("Bhai, name aur email dono bhariye!");
-
-    try {
-        // 1. Firebase Auth mein account create karna
-        const res = await createUserWithEmailAndPassword(auth, email, pass);
-        
-        // 2. Firestore mein user ka role 'sub-admin' set karna
-        await setDoc(doc(db, "users", res.user.uid), {
-            uid: res.user.uid,
-            name: name,
-            email: email,
-            role: 'sub-admin',
-            status: 'active'
-        });
-
-        // 3. Admin ko details dikhana taaki wo bhej sake
-        alert(`🎉 Sub-Admin Account Created!\n\nName: ${name}\nEmail: ${email}\nPassword: ${pass}\n\nIn details ko copy karke naye admin ko bhej dein.`);
-        
-        closeModal();
-        location.reload();
-    } catch (err) {
-        if(err.code === 'auth/email-already-in-use') {
-            alert("Ye email pehle se register hai!");
-        } else {
-            alert("Error: " + err.message);
-        }
-    }
-};
-
-        // --- TENANT DETAILS & PAYMENT ---
         window.viewTenantDetail = async (uid) => {
             const snap = await getDoc(doc(db, "users", uid));
             const t = snap.data();
             openModal(`Details: ${t.name}`, `
-                <p><b>Mobile:</b> ${t.phone}</p>
-                <p><b>Room:</b> ${t.room} | <b>Bed:</b> ${t.bed}</p>
-                <p><b>Current Due:</b> ₹${t.totalDue}</p>
-                <button class="btn-gold" style="width:100%; background:#2ecc71" onclick="collectPayment('${uid}', ${t.totalDue})">Receive Payment</button>
+                <p><b>Phone:</b> ${t.phone}</p>
+                <p><b>Room/Bed:</b> ${t.room} / ${t.bed}</p>
+                <p><b>Balance Due:</b> ₹${t.totalDue}</p>
+                <button class="btn-gold" style="width:100%; background:var(--green); color:white" onclick="collectPayment('${uid}', ${t.totalDue})">Receive Payment</button>
             `);
         };
 
         window.collectPayment = async (uid, due) => {
-            const amt = prompt(`Current Due: ₹${due}. Enter amount received:`);
+            const amt = prompt(`Current Due: ₹${due}. Received amount:`);
             if(!amt || isNaN(amt)) return;
             await updateDoc(doc(db, "users", uid), { totalDue: due - Number(amt) });
             alert("Payment Recorded!");
             location.reload();
         };
 
-        // --- PROFILE ---
+        // --- 6. PROFILE ---
         window.openProfileModal = async () => {
-            const user = auth.currentUser;
-            if(!user) return alert("Login first!");
-            const snap = await getDoc(doc(db, "users", user.uid));
-            const d = snap.data();
-            openModal("My Profile", `<p><b>Name:</b> ${d.name}</p><p><b>Email:</b> ${d.email}</p><p><b>Role:</b> ${d.role.toUpperCase()}</p>`);
+            onAuthStateChanged(auth, async (user) => {
+                if(user) {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    const d = snap.data();
+                    openModal("Admin Profile", `<p><b>Name:</b> ${d.name}</p><p><b>Email:</b> ${d.email}</p><p><b>Role:</b> ${d.role.toUpperCase()}</p>`);
+                }
+            });
         };
 
         // UI HELPERS
@@ -198,43 +238,7 @@
         };
         window.closeModal = () => document.getElementById('modal').style.display = 'none';
 
-        // Load rooms on start
         loadRooms();
-        // --- Function: Har Mahine ka Rent Sab par Apply karna ---
-         window.applyMonthlyRent = async () => {
-    const rentAmount = prompt("Iss mahine ka Rent amount bhariye (e.g. 3000):");
-    
-    // Check if input is a valid number
-    if (!rentAmount || isNaN(rentAmount)) return alert("Bhai, sahi amount bhariye!");
-
-    if (confirm(`Kya aap sabhi tenants ke account mein ₹${rentAmount} rent add karna chahte hain?`)) {
-        try {
-            // Sirf 'tenant' role waale users ko fetch karna
-            const q = query(collection(db, "users"), where("role", "==", "tenant"));
-            const snap = await getDocs(q);
-            
-            let count = 0;
-            const updates = [];
-
-            snap.forEach((tenantDoc) => {
-                const data = tenantDoc.data();
-                // Purane due mein naya rent jodna (Rolling Debt)
-                const newTotal = (Number(data.totalDue) || 0) + Number(rentAmount);
-                
-                const upRef = doc(db, "users", tenantDoc.id);
-                updates.push(updateDoc(upRef, { totalDue: newTotal }));
-                count++;
-            });
-
-            // Saare updates ek saath execute karna
-            await Promise.all(updates);
-            alert(`Success! ${count} tenants ka rent update ho gaya.`);
-            location.reload();
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
-    }
-};
     </script>
 </body>
 </html>
