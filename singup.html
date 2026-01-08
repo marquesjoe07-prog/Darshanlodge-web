@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tenant Registration - Darshan Lodge</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000a1a;
+        color: white;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .signup-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      h2 {
+        color: #d4af37;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      p {
+        text-align: center;
+        font-size: 0.9rem;
+        opacity: 0.7;
+        margin-bottom: 30px;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        font-size: 0.8rem;
+        color: #d4af37;
+        margin-bottom: 5px;
+        margin-left: 5px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        box-sizing: border-box;
+        font-size: 1rem;
+      }
+
+      input:focus {
+        border-color: #d4af37;
+        outline: none;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #d4af37, #aa8a2e);
+        border: none;
+        border-radius: 8px;
+        color: black;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: 0.3s;
+      }
+
+      .btn-submit:active {
+        transform: scale(0.98);
+      }
+
+      #success-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000a1a;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="success-overlay">
+      <h1 style="color: #d4af37">✔️ Application Sent</h1>
+      <p>
+        Your details have been submitted to Darshan Lodge Admin.<br />Please
+        wait for approval.
+      </p>
+    </div>
+
+    <div class="signup-card">
+      <h2>Tenant Registration</h2>
+      <p>Please enter your official details</p>
+
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="tenantName" placeholder="As per Aadhar" />
+      </div>
+
+      <div class="input-group">
+        <label>Mobile Number</label>
+        <input type="tel" id="tenantMobile" placeholder="10-digit number" />
+      </div>
+
+      <div class="input-group">
+        <label>Aadhar Number</label>
+        <input type="number" id="tenantAadhar" placeholder="12-digit Aadhar" />
+      </div>
+
+      <div class="input-group">
+        <label>Preferred Floor</label>
+        <select id="prefFloor">
+          <option value="1">Floor 1</option>
+          <option value="2">Floor 2</option>
+          <option value="3">Floor 3</option>
+          <option value="4">Floor 4</option>
+        </select>
+      </div>
+
+      <button class="btn-submit" onclick="submitApplication()">
+        Submit Application
+      </button>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+      // Your Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
+        authDomain: "darshan-lodge-16d22.firebaseapp.com",
+        projectId: "darshan-lodge-16d22",
+        storageBucket: "darshan-lodge-16d22.firebasestorage.app",
+        messagingSenderId: "834416173936",
+        appId: "1:834416173936:web:c6e62b396e5072f3e7e5b5",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      window.submitApplication = async () => {
+        const name = document.getElementById("tenantName").value;
+        const mobile = document.getElementById("tenantMobile").value;
+        const aadhar = document.getElementById("tenantAadhar").value;
+        const floor = document.getElementById("prefFloor").value;
+
+        if (!name || !mobile || !aadhar) {
+          alert("Please fill all fields");
+          return;
+        }
+
+        try {
+          await addDoc(collection(db, "pending_requests"), {
+            name: name,
+            mobile: mobile,
+            aadhar: aadhar,
+            preferredFloor: floor,
+            status: "pending",
+            submittedAt: new Date(),
+          });
+
+          document.getElementById("success-overlay").style.display = "flex";
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
+      };
+    </script>
+  </body>
+</html>
