@@ -3,31 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Darshan Lodge</title>
+    <title>Master Admin - Darshan Lodge</title>
     <style>
-        :root { --gold: #d4af37; --blue-glass: rgba(0, 122, 255, 0.15); }
-        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; }
+        :root { --gold: #d4af37; --red: #ff4d4d; --blue-glass: rgba(0, 122, 255, 0.15); }
+        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+        
+        /* Navigation */
         .top-nav { height: 60px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; width: 100%; box-sizing: border-box; top: 0; z-index: 100; }
         .sidebar { padding: 80px 15px 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; background: rgba(255,255,255,0.03); }
+        
+        /* Grid */
         .grid { display: grid; grid-template-columns: 1fr; gap: 15px; padding: 15px; }
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-        .room-card { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .room-card { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* UI Elements */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 200; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         .modal-box { background: #001529; padding: 20px; border-radius: 15px; border: 1px solid var(--gold); max-width: 500px; margin: auto; }
-        .btn-gold { background: var(--gold); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
+        .btn-gold { background: var(--gold); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; margin: 2px; }
+        .btn-red { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .tenant-row { border-bottom: 1px solid #333; padding: 10px 0; display: flex; flex-direction: column; gap: 5px; }
     </style>
 </head>
 <body>
     <div class="top-nav">
-        <button class="btn-gold" style="border-radius:50%;" onclick="addAdmin()">➕</button>
-        <span style="font-weight:bold;">ADMIN PANEL</span>
-        <button class="btn-gold" style="border-radius:5px;" onclick="showProfile()">👤</button>
+        <button class="btn-gold" style="border-radius:50%;" onclick="alert('Admin Add Logic')">➕</button>
+        <span style="font-weight:bold; color:var(--gold);">DARSHAN ADMIN</span>
+        <button class="btn-gold" onclick="location.reload()">👤</button>
     </div>
 
     <div class="sidebar">
         <button class="btn-gold" onclick="loadApprovals()">📩 Approvals</button>
-        <button class="btn-gold" onclick="loadDirectory()">📞 Directory</button>
-        <button class="btn-gold" style="background:#ff6b6b" onclick="alert('Defaulters coming soon')">⚠️ Defaulters</button>
+        <button class="btn-gold" onclick="loadDirectory()">📞 Directory/Manage</button>
+        <button class="btn-gold" style="background:#ff6b6b" onclick="alert('Monthly reset logic coming')">⚠️ Reset Month</button>
     </div>
 
     <div id="modal" class="modal">
@@ -38,16 +46,16 @@
         </div>
     </div>
 
-    <div class="grid">
-        <div class="room-card"><h3>Room 1</h3><div id="r1">Empty</div></div>
-        <div class="room-card"><h3>Room 2</h3><div id="r2">Empty</div></div>
-        <div class="room-card"><h3>Room 3</h3><div id="r3">Empty</div></div>
-        <div class="room-card"><h3>Room 4</h3><div id="r4">Empty</div></div>
+    <div class="grid" id="mainGrid">
+        <div class="room-card"><h3>Room 1</h3><div id="r1">Loading...</div></div>
+        <div class="room-card"><h3>Room 2</h3><div id="r2">Loading...</div></div>
+        <div class="room-card"><h3>Room 3</h3><div id="r3">Loading...</div></div>
+        <div class="room-card"><h3>Room 4</h3><div id="r4">Loading...</div></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, query, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, query, getDocs, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -62,58 +70,78 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // --- 1. Load Approvals ---
         window.loadApprovals = async () => {
             const q = query(collection(db, "pending_requests"));
             const snap = await getDocs(q);
             let html = "";
             snap.forEach(d => {
                 const data = d.data();
-                html += `<div style="border:1px solid #333; padding:10px; margin-bottom:10px;">
+                html += `<div class="tenant-row">
                     <p><strong>${data.name}</strong> (${data.email})</p>
-                    <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.pass}', '${data.phone}', '${data.parent}')">Approve & Create Account</button>
+                    <img src="${data.aadharPhoto}" style="width:100px; border-radius:5px; border:1px solid var(--gold)">
+                    <button class="btn-gold" onclick="approveUser('${d.id}', '${data.name}', '${data.email}', '${data.pass}', '${data.phone}', '${data.parent}')">Approve</button>
                 </div>`;
             });
-            document.getElementById('modalTitle').innerText = "Pending Approvals";
-            document.getElementById('modalContent').innerHTML = html || "No pending requests.";
-            document.getElementById('modal').style.display = 'block';
+            openModal("Pending Approvals", html || "No pending requests.");
         };
 
         window.approveUser = async (id, name, email, pass, phone, parent) => {
             const room = prompt("Room (1-4):");
             const bed = prompt("Bed (1-2):");
             if(!room || !bed) return;
-
             try {
-                // 1. Create real Auth Account so they can login
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                const user = userCredential.user;
-
-                // 2. Save tenant profile with their UID
-                await setDoc(doc(db, "users", user.uid), {
-                    name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    name, email, phone, parentPhone: parent, room, bed, role: 'tenant', totalDue: 0, status: 'active'
                 });
-
-                // 3. Cleanup pending request
                 await deleteDoc(doc(db, "pending_requests", id));
-                
-                alert(`Account Created for ${name}! They can login now.`);
+                alert("Account Activated!");
                 location.reload();
-            } catch(e) { 
-                alert("Approval Failed: " + e.message); 
+            } catch(e) { alert(e.message); }
+        };
+
+        // --- 2. Directory & Management (Delete/Room Change) ---
+        window.loadDirectory = async () => {
+            const snap = await getDocs(collection(db, "users"));
+            let html = "";
+            snap.forEach(d => {
+                const data = d.data();
+                if(data.role === 'tenant') {
+                    html += `<div class="tenant-row">
+                        <p><strong>${data.name}</strong> (R: ${data.room} | B: ${data.bed})</p>
+                        <div>
+                            <button class="btn-gold" onclick="changeRoom('${d.id}')">🔄 Change Room</button>
+                            <button class="btn-red" onclick="deleteTenant('${d.id}', '${data.name}')">🗑️ Delete</button>
+                        </div>
+                    </div>`;
+                }
+            });
+            openModal("Manage Tenants", html);
+        };
+
+        window.changeRoom = async (uid) => {
+            const newRoom = prompt("New Room (1-4):");
+            const newBed = prompt("New Bed (1-2):");
+            if(newRoom && newBed) {
+                await updateDoc(doc(db, "users", uid), { room: newRoom, bed: newBed });
+                alert("Room Updated!");
+                location.reload();
             }
         };
 
-        window.loadDirectory = async () => {
-            const snap = await getDocs(query(collection(db, "users")));
-            let list = ""; 
-            snap.forEach(d => { 
-                const data = d.data();
-                if(data.role === 'tenant') {
-                    list += `<p>🏠 Room ${data.room} - Bed ${data.bed}: <strong>${data.name}</strong> (${data.phone})</p>`;
-                }
-            });
-            document.getElementById('modalTitle').innerText = "Directory";
-            document.getElementById('modalContent').innerHTML = list || "No tenants found.";
+        window.deleteTenant = async (uid, name) => {
+            if(confirm(`Are you sure you want to delete ${name}?`)) {
+                await deleteDoc(doc(db, "users", uid));
+                alert("Tenant removed from database.");
+                location.reload();
+            }
+        };
+
+        // UI Helpers
+        const openModal = (title, html) => {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalContent').innerHTML = html;
             document.getElementById('modal').style.display = 'block';
         };
     </script>
