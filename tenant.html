@@ -18,7 +18,7 @@
         .top-nav { height: 70px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
         .avatar-circle { width: 42px; height: 42px; background: linear-gradient(45deg, var(--gold), #f9e297); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); transition: 0.3s; }
 
-        .container { padding: 100px 20px 40px; max-width: 500px; margin: auto; flex: 1; }
+        .container { padding: 100px 20px 40px; max-width: 500px; margin: auto; flex: 1; width: 100%; box-sizing: border-box; }
 
         /* Lodge Branding */
         .lodge-brand { text-align: center; margin-bottom: 25px; }
@@ -44,10 +44,11 @@
         .btn-pay-blue { width: 100%; padding: 16px; background: var(--blue-btn); border: none; border-radius: 15px; color: white; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3); }
         .btn-pay-blue:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 123, 255, 0.4); }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        /* Modal Settings */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: #001226; border: 1px solid var(--gold); padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
 
-        footer { text-align: center; padding: 25px; font-size: 0.65rem; opacity: 0.4; letter-spacing: 1.5px; }
+        footer { text-align: center; padding: 25px; font-size: 0.65rem; opacity: 0.4; letter-spacing: 1.5px; margin-top: auto; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -65,7 +66,7 @@
 
         <div class="greeting-section">
             <p>It is a distinct pleasure to have you staying with us,</p>
-            <h2 id="userName">Valued Resident</h2>
+            <h2 id="userName">Hello! Resident</h2>
         </div>
 
         <div class="due-card">
@@ -119,6 +120,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
             authDomain: "darshan-lodge-16d22.firebaseapp.com",
@@ -134,23 +136,33 @@
 
         let tenantData = null;
 
+        // Sync UI with Firebase Data
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if (snap.exists()) {
                     tenantData = snap.data();
                     const initial = tenantData.name ? tenantData.name.charAt(0).toUpperCase() : "U";
+                    
+                    // Update Header and Profile Avatars
                     document.getElementById('userAvatar').innerText = initial;
                     document.getElementById('modalAvatar').innerText = initial;
-                    document.getElementById('userName').innerText = 'Hello!$(tenantData.name)';
+                    
+                    // FIXED: Using Template Literals for Greeting
+                    document.getElementById('userName').innerText = `Hello! ${tenantData.name}`;
+                    
                     document.getElementById('displayDue').innerText = `₹ ${tenantData.totalDue || 0}`;
-                    document.getElementById('roomPill').innerText = `Room: ${tenantData.room}`;
-                    document.getElementById('bedPill').innerText = `Bed: ${tenantData.bed}`;
+                    document.getElementById('roomPill').innerText = `Room: ${tenantData.room || '--'}`;
+                    document.getElementById('bedPill').innerText = `Bed: ${tenantData.bed || '--'}`;
+                    
                     updateLedger(tenantData.totalDue);
                 }
-            } else { window.location.href = 'index.html'; }
+            } else { 
+                window.location.href = 'index.html'; 
+            }
         });
 
+        // Update Ledger Table Based on Dues
         function updateLedger(due) {
             const table = document.getElementById('ledgerBody');
             const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
@@ -158,24 +170,36 @@
             table.innerHTML = `<tr><td>${date}</td><td>${status}</td><td style="font-weight:700;">₹ ${due}</td></tr>`;
         }
 
+        // Open External UPI Payment App
         window.openPayment = () => {
+            if (!tenantData) return;
             const due = tenantData.totalDue || 0;
-            if(due <= 0) return alert("Everything is clear. No dues found!");
-            const upiId = "priyadarshan07@airtel"; // Replace with your real ID
+            if (due <= 0) return alert("Everything is clear. No dues found!");
+            
+            const upiId = "priyadarshan07@airtel"; 
             window.location.href = `upi://pay?pa=${upiId}&pn=DarshanLodge&am=${due}&cu=INR`;
         };
 
+        // Modal Controls
         window.openProfile = () => {
+            if (!tenantData) return;
             document.getElementById('mName').innerText = tenantData.name;
             document.getElementById('mEmail').innerText = tenantData.email;
-            document.getElementById('mPhone').innerText = tenantData.phone;
-            document.getElementById('mParent').innerText = tenantData.parentPhone;
-            document.getElementById('mRoom').innerText = tenantData.room;
+            document.getElementById('mPhone').innerText = tenantData.phone || 'N/A';
+            document.getElementById('mParent').innerText = tenantData.parentPhone || 'N/A';
+            document.getElementById('mRoom').innerText = tenantData.room || '--';
             document.getElementById('profileModal').style.display = 'flex';
         };
 
-        window.closeProfile = () => { document.getElementById('profileModal').style.display = 'none'; };
-        window.handleLogout = () => { signOut(auth).then(() => { window.location.href = 'index.html'; }); };
+        window.closeProfile = () => { 
+            document.getElementById('profileModal').style.display = 'none'; 
+        };
+
+        window.handleLogout = () => { 
+            signOut(auth).then(() => { 
+                window.location.href = 'index.html'; 
+            }); 
+        };
     </script>
 </body>
 </html>
