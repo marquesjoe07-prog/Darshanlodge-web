@@ -128,15 +128,38 @@
         };
 
         window.saveSubAdmin = async () => {
-            const n = document.getElementById('admName').value;
-            const e = document.getElementById('admEmail').value;
-            try {
-                const res = await createUserWithEmailAndPassword(auth, e, "lodge123");
-                await setDoc(doc(db, "users", res.user.uid), { name: n, email: e, role: 'sub-admin' });
-                alert("Sub-Admin Added!");
-                location.reload();
-            } catch(err) { alert(err.message); }
-        };
+    const name = document.getElementById('admName').value;
+    const email = document.getElementById('admEmail').value;
+    const pass = "lodge123"; // Ye aapka default password hai
+
+    if(!name || !email) return alert("Bhai, name aur email dono bhariye!");
+
+    try {
+        // 1. Firebase Auth mein account create karna
+        const res = await createUserWithEmailAndPassword(auth, email, pass);
+        
+        // 2. Firestore mein user ka role 'sub-admin' set karna
+        await setDoc(doc(db, "users", res.user.uid), {
+            uid: res.user.uid,
+            name: name,
+            email: email,
+            role: 'sub-admin',
+            status: 'active'
+        });
+
+        // 3. Admin ko details dikhana taaki wo bhej sake
+        alert(`🎉 Sub-Admin Account Created!\n\nName: ${name}\nEmail: ${email}\nPassword: ${pass}\n\nIn details ko copy karke naye admin ko bhej dein.`);
+        
+        closeModal();
+        location.reload();
+    } catch (err) {
+        if(err.code === 'auth/email-already-in-use') {
+            alert("Ye email pehle se register hai!");
+        } else {
+            alert("Error: " + err.message);
+        }
+    }
+};
 
         // --- TENANT DETAILS & PAYMENT ---
         window.viewTenantDetail = async (uid) => {
