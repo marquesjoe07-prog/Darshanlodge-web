@@ -3,124 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Portal - Darshan Lodge</title>
+    <title>Tenant Portal - Darshan Lodge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --gold: #d4af37; 
-            --gold-glow: rgba(212, 175, 55, 0.4);
-            --blue-btn: #007bff; /* Royal Blue Shade */
-            --blue-glass: rgba(255, 255, 255, 0.08); 
-            --dark: #000814; 
+            --gold: #d4af37; --red: #ff4d4d; --green: #2ecc71; --blue: #3498db; 
+            --dark: #000814; --gold-glow: rgba(212, 175, 55, 0.4);
+            --glass: rgba(255, 255, 255, 0.05);
         }
         
-        body { margin: 0; background: var(--dark); color: white; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+        body { margin: 0; background: var(--dark); color: white; font-family: 'Poppins', sans-serif; min-height: 100vh; padding-top: 80px; }
 
-        .top-nav { height: 70px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
-        .avatar-circle { width: 42px; height: 42px; background: linear-gradient(45deg, var(--gold), #f9e297); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); transition: 0.3s; }
+        /* Premium Top Nav */
+        .top-nav { height: 75px; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
+        .nav-logo { font-weight: 800; color: var(--gold); letter-spacing: 3px; font-size: 0.9rem; }
+        .avatar-circle { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); overflow: hidden; cursor: pointer; background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); }
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-        .container { padding: 100px 20px 40px; max-width: 500px; margin: auto; flex: 1; width: 100%; box-sizing: border-box; }
-
-        /* Lodge Branding */
-        .lodge-brand { text-align: center; margin-bottom: 25px; }
-        .lodge-brand h1 { font-size: 2.2rem; font-weight: 900; color: var(--gold); letter-spacing: 4px; margin: 0; text-shadow: 0 0 20px var(--gold-glow); }
+        .container { max-width: 500px; margin: auto; padding: 20px; box-sizing: border-box; }
 
         /* Classy Greeting */
-        .greeting-section { margin-bottom: 30px; border-left: 3px solid var(--gold); padding-left: 15px; }
-        .greeting-section p { margin: 0; font-size: 0.85rem; font-weight: 300; opacity: 0.7; font-style: italic; }
-        .greeting-section h2 { margin: 5px 0 0; font-size: 1.7rem; font-weight: 700; color: var(--gold); text-transform: capitalize; }
+        .greeting-card { margin-bottom: 30px; }
+        .greeting-card p { margin: 0; font-size: 0.8rem; opacity: 0.6; letter-spacing: 1px; }
+        .greeting-card h2 { margin: 5px 0; font-size: 1.8rem; color: var(--gold); font-weight: 700; text-transform: capitalize; }
 
-        /* Due Card */
-        .due-card { background: var(--blue-glass); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 35px 20px; text-align: center; margin-bottom: 30px; backdrop-filter: blur(10px); }
-        .due-card h1 { font-size: 3.5rem; margin: 10px 0; font-weight: 800; }
-        .pill { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin: 5px; }
+        /* Balance Card */
+        .balance-card { background: linear-gradient(145deg, #001a33, #000814); border-radius: 25px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .balance-card span { font-size: 0.7rem; text-transform: uppercase; opacity: 0.5; letter-spacing: 2px; }
+        .balance-card h1 { font-size: 3.2rem; margin: 10px 0; font-weight: 800; text-shadow: 0 0 15px rgba(255,255,255,0.1); }
+        .status-pill { display: inline-block; padding: 6px 15px; border-radius: 50px; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); font-size: 0.7rem; font-weight: 600; margin: 5px; }
 
-        /* History Table */
-        .history-card { background: var(--blue-glass); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; margin-bottom: 20px; }
+        /* Action Grid */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .btn-action { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.2); padding: 15px; border-radius: 18px; color: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 600; }
+        .btn-action:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); transform: translateY(-3px); }
+
+        /* Tables (History & Admin) */
+        .section-title { font-size: 0.75rem; color: var(--gold); margin: 30px 0 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; border-left: 3px solid var(--gold); padding-left: 10px;}
+        .table-card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; }
-        th { padding: 15px; text-align: left; font-size: 0.7rem; opacity: 0.5; color: var(--gold); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        td { padding: 18px 15px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        th { text-align: left; padding: 12px 15px; font-size: 0.65rem; opacity: 0.6; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: rgba(212, 175, 55, 0.1); color: var(--gold); border: 0.5px solid var(--gold); font-weight: 600; }
 
-        /* Blue Payment Button */
-        .btn-pay-blue { width: 100%; padding: 16px; background: var(--blue-btn); border: none; border-radius: 15px; color: white; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3); }
-        .btn-pay-blue:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 123, 255, 0.4); }
+        /* VIP Payment Button */
+        .btn-pay { width: 100%; padding: 18px; background: var(--blue); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3); transition: 0.3s; }
+        .btn-pay:hover { transform: scale(1.02); }
 
-        /* Modal Settings */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: #001226; border: 1px solid var(--gold); padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
+        /* Modals */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: #001a33; border: 1px solid var(--gold); padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
+        .profile-info { text-align: left; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; margin-top: 15px; font-size: 0.85rem; line-height: 1.8; }
 
-        footer { text-align: center; padding: 25px; font-size: 0.65rem; opacity: 0.4; letter-spacing: 1.5px; margin-top: auto; }
+        textarea { width: 100%; padding: 12px; background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 10px; color: white; margin-bottom: 15px; font-family: inherit; }
+        footer { text-align: center; padding: 30px; font-size: 0.65rem; opacity: 0.4; letter-spacing: 2px; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="top-nav">
-        <span style="font-weight:bold; color:var(--gold); font-size:0.8rem; letter-spacing:1px;">TENANT PORTAL</span>
+        <div class="nav-logo">TENANT PORTAL</div>
         <div class="avatar-circle" id="userAvatar" onclick="openProfile()">?</div>
     </div>
 
     <div class="container">
-        <div class="lodge-brand">
-            <h1>DARSHAN LODGE</h1>
+        <div class="greeting-card">
+            <p>Welcome back to your residence,</p>
+            <h2 id="userName">Resident</h2>
         </div>
 
-        <div class="greeting-section">
-            <p>It is a distinct pleasure to have you staying with us,</p>
-            <h2 id="userName">Hello! Resident</h2>
-        </div>
-
-        <div class="due-card">
-            <span style="font-size:0.7rem; opacity:0.6; text-transform:uppercase;">Outstanding Balance</span>
+        <div class="balance-card">
+            <span>Outstanding Balance</span>
             <h1 id="displayDue">₹ 0</h1>
             <div>
-                <div class="pill" id="roomPill">Room: --</div>
-                <div class="pill" id="bedPill">Bed: --</div>
+                <div class="status-pill" id="roomPill">Room: --</div>
+                <div class="status-pill" id="bedPill">Bed: --</div>
             </div>
         </div>
 
-        <h4 style="color:var(--gold); margin-bottom:15px; font-size:0.8rem; letter-spacing:1.5px; text-transform: uppercase;">Payment History</h4>
-        <div class="history-card">
+        <div class="action-grid">
+            <button class="btn-action" onclick="openComplaintModal()">
+                <span style="font-size: 1.5rem; margin-bottom: 5px;">📢</span>
+                Support & Query
+            </button>
+            <button class="btn-action" onclick="openProfile()">
+                <span style="font-size: 1.5rem; margin-bottom: 5px;">👤</span>
+                My Profile
+            </button>
+        </div>
+
+        <button class="btn-pay" onclick="handlePayment()">Settle Dues Securely</button>
+        <p style="text-align: center; font-size: 0.6rem; opacity: 0.5; margin-top: 12px;">
+            ⚠️ If payment is blocked, please pay via <b>Scanning QR</b> in office.
+        </p>
+
+        <div class="section-title">Lodge Authorities</div>
+        <div class="table-card">
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Amount</th>
+                        <th>Admin Name</th>
+                        <th style="text-align: right;">Authority Role</th>
                     </tr>
                 </thead>
-                <tbody id="ledgerBody"></tbody>
+                <tbody id="adminTableBody">
+                    <tr><td colspan="2" style="text-align:center; opacity:0.5; font-size: 0.7rem; padding: 20px;">Fetching authorities...</td></tr>
+                </tbody>
             </table>
         </div>
 
-        <button class="btn-pay-blue" onclick="openPayment()">Settle Dues Securely</button>
+        <div class="section-title">Recent Payments</div>
+        <div class="table-card">
+            <table id="historyTable">
+                <tbody>
+                    <tr><td style="text-align:center; opacity:0.5; font-size: 0.7rem; padding: 20px;">Loading history...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <footer>
-        ©️ 2026 ALL RIGHTS RESERVED TO DARSHAN LODGE<br>
-        DESIGNED & MANAGED BY OWNER: PDJ
-    </footer>
+    <footer>©️ 2026 DARSHAN LODGE | ALL RIGHTS RESERVED</footer>
 
     <div id="profileModal" class="modal">
         <div class="modal-box">
-            <div class="avatar-circle" style="width:60px; height:60px; font-size:1.5rem; margin: 0 auto 15px;" id="modalAvatar">?</div>
-            <h2 id="mName" style="color:var(--gold); margin:0;">User Name</h2>
-            <p id="mEmail" style="opacity:0.6; margin:5px 0 25px; font-size:0.85rem;">user@email.com</p>
-            <div style="text-align:left; background:rgba(255,255,255,0.03); padding:15px; border-radius:15px; font-size:0.9rem;">
-                <p><b>Phone:</b> <span id="mPhone">--</span></p>
-                <p><b>Guardian:</b> <span id="mParent">--</span></p>
-                <p><b>Accommodation:</b> Room <span id="mRoom">--</span></p>
+            <div class="avatar-circle" style="width:70px; height:70px; margin:0 auto 10px; font-size:1.5rem;" id="modalAvatar">?</div>
+            <input type="file" id="photoUpload" style="display:none" accept="image/*" onchange="uploadPhoto(this)">
+            <button class="status-pill" style="cursor:pointer; background:none;" onclick="document.getElementById('photoUpload').click()">Change Profile Photo</button>
+            
+            <h2 id="pName" style="color:var(--gold); margin:15px 0 5px;">Name</h2>
+            <p id="pEmail" style="font-size:0.75rem; opacity:0.5; margin:0;">email@darshan.com</p>
+
+            <div class="profile-info">
+                <div><b>Phone:</b> <span id="pPhone">--</span></div>
+                <div><b>Guardian:</b> <span id="pParent">--</span></div>
+                <div><b>Residence:</b> Room <span id="pRoom">--</span> / Bed <span id="pBed">--</span></div>
             </div>
-            <button class="btn-pay-blue" style="margin-top:20px; padding:12px;" onclick="closeProfile()">Close Profile</button>
-            <p onclick="handleLogout()" style="color:#ff4d4d; font-size:0.75rem; margin-top:20px; cursor:pointer; font-weight:bold;">LOGOUT SESSION</p>
+
+            <button class="btn-pay" style="margin-top:20px; background:#222; font-size:0.8rem;" onclick="closeModal('profileModal')">Close Portal</button>
+            <p onclick="logout()" style="color:var(--red); font-size:0.7rem; margin-top:15px; cursor:pointer; font-weight:bold;">LOGOUT SESSION</p>
+        </div>
+    </div>
+
+    <div id="compModal" class="modal">
+        <div class="modal-box">
+            <h3 style="color:var(--gold); margin-top:0;">Lodge Support</h3>
+            <textarea id="compMsg" rows="4" placeholder="Describe your query or complaint here..."></textarea>
+            <button class="btn-pay" onclick="submitQuery()">Send Message</button>
+            <button class="btn-pay" style="margin-top:10px; background:none; border:1px solid #444;" onclick="closeModal('compModal')">Cancel</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, orderBy, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
             authDomain: "darshan-lodge-16d22.firebaseapp.com",
@@ -134,72 +171,137 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let tenantData = null;
+        let currentUser = null;
 
-        // Sync UI with Firebase Data
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if (snap.exists()) {
-                    tenantData = snap.data();
-                    const initial = tenantData.name ? tenantData.name.charAt(0).toUpperCase() : "U";
-                    
-                    // Update Header and Profile Avatars
-                    document.getElementById('userAvatar').innerText = initial;
-                    document.getElementById('modalAvatar').innerText = initial;
-                    
-                    // FIXED: Using Template Literals for Greeting
-                    document.getElementById('userName').innerText = `Hello! ${tenantData.name}`;
-                    
-                    document.getElementById('displayDue').innerText = `₹ ${tenantData.totalDue || 0}`;
-                    document.getElementById('roomPill').innerText = `Room: ${tenantData.room || '--'}`;
-                    document.getElementById('bedPill').innerText = `Bed: ${tenantData.bed || '--'}`;
-                    
-                    updateLedger(tenantData.totalDue);
+                    currentUser = { ...snap.data(), uid: user.uid };
+                    renderDashboard();
+                    fetchHistory();
+                    fetchAdminDirectory();
                 }
-            } else { 
-                window.location.href = 'index.html'; 
-            }
+            } else { window.location.href = 'index.html'; }
         });
 
-        // Update Ledger Table Based on Dues
-        function updateLedger(due) {
-            const table = document.getElementById('ledgerBody');
-            const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-            const status = due > 0 ? `<span style="color:#ff4d4d; font-weight:700;">Pending</span>` : `<span style="color:#2ecc71; font-weight:700;">Cleared</span>`;
-            table.innerHTML = `<tr><td>${date}</td><td>${status}</td><td style="font-weight:700;">₹ ${due}</td></tr>`;
+        async function fetchAdminDirectory() {
+            const table = document.getElementById('adminTableBody');
+            try {
+                const q = query(collection(db, "users"), where("role", "!=", "tenant"));
+                const snap = await getDocs(q);
+                
+                table.innerHTML = "";
+                if(snap.empty) {
+                    table.innerHTML = `<tr><td colspan="2" style="text-align:center;">No authorities listed</td></tr>`;
+                    return;
+                }
+
+                snap.forEach(d => {
+                    const data = d.data();
+                    const roleLabel = data.email === 'marquesjoe07@gmail.com' ? 'Master Admin' : 'Sub Admin';
+                    table.innerHTML += `
+                        <tr>
+                            <td style="font-weight:600;">${data.name}</td>
+                            <td style="text-align:right;"><span class="role-badge">${roleLabel}</span></td>
+                        </tr>
+                    `;
+                });
+            } catch (e) { console.error(e); }
         }
 
-        // Open External UPI Payment App
-        window.openPayment = () => {
-            if (!tenantData) return;
-            const due = tenantData.totalDue || 0;
-            if (due <= 0) return alert("Everything is clear. No dues found!");
+        function renderDashboard() {
+            document.getElementById('userName').innerText = `Hello! ${currentUser.name}`;
+            document.getElementById('displayDue').innerText = `₹ ${currentUser.totalDue || 0}`;
+            document.getElementById('roomPill').innerText = `Room: ${currentUser.room}`;
+            document.getElementById('bedPill').innerText = `Bed: ${currentUser.bed}`;
             
-            const upiId = "priyadarshan07@airtel"; 
-            window.location.href = `upi://pay?pa=${upiId}&pn=DarshanLodge&am=${due}&cu=INR`;
+            const avatar = document.getElementById('userAvatar');
+            const modAvatar = document.getElementById('modalAvatar');
+            if(currentUser.photo) {
+                avatar.innerHTML = `<img src="${currentUser.photo}">`;
+                modAvatar.innerHTML = `<img src="${currentUser.photo}">`;
+            } else {
+                avatar.innerText = currentUser.name.charAt(0).toUpperCase();
+                modAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
+            }
+        }
+
+        async function fetchHistory() {
+            const tableBody = document.querySelector('#historyTable tbody');
+            const q = query(collection(db, "payments"), where("tenantId", "==", currentUser.uid), orderBy("date", "desc"));
+            const snap = await getDocs(q);
+            
+            tableBody.innerHTML = "";
+            if(snap.empty) {
+                tableBody.innerHTML = `<tr><td style="text-align:center; opacity:0.5; padding: 20px;">No transactions found</td></tr>`;
+                return;
+            }
+
+            snap.forEach(d => {
+                const p = d.data();
+                const date = p.date ? p.date.toDate().toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) : 'N/A';
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;">Rent Payment</div>
+                            <div style="opacity:0.5; font-size:0.7rem;">${date} • ${p.type}</div>
+                        </td>
+                        <td style="text-align:right; font-weight:800; color:var(--green);">₹ ${p.amount}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.uploadPhoto = (input) => {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const base64 = e.target.result;
+                    await updateDoc(doc(db, "users", currentUser.uid), { photo: base64 });
+                    currentUser.photo = base64;
+                    renderDashboard();
+                    alert("Profile Picture Updated!");
+                };
+                reader.readAsDataURL(file);
+            }
         };
 
-        // Modal Controls
+        window.handlePayment = () => {
+            const due = currentUser.totalDue || 0;
+            if (due <= 0) return alert("You have no outstanding dues. Thank you!");
+            window.location.href = `upi://pay?pa=priyadarshan07@airtel&pn=DarshanLodge&am=${due}&cu=INR`;
+        };
+
         window.openProfile = () => {
-            if (!tenantData) return;
-            document.getElementById('mName').innerText = tenantData.name;
-            document.getElementById('mEmail').innerText = tenantData.email;
-            document.getElementById('mPhone').innerText = tenantData.phone || 'N/A';
-            document.getElementById('mParent').innerText = tenantData.parentPhone || 'N/A';
-            document.getElementById('mRoom').innerText = tenantData.room || '--';
+            document.getElementById('pName').innerText = currentUser.name;
+            document.getElementById('pEmail').innerText = currentUser.email;
+            document.getElementById('pPhone').innerText = currentUser.phone || 'N/A';
+            document.getElementById('pParent').innerText = currentUser.parentPhone || 'N/A';
+            document.getElementById('pRoom').innerText = currentUser.room;
+            document.getElementById('pBed').innerText = currentUser.bed;
             document.getElementById('profileModal').style.display = 'flex';
         };
 
-        window.closeProfile = () => { 
-            document.getElementById('profileModal').style.display = 'none'; 
+        window.submitQuery = async () => {
+            const msg = document.getElementById('compMsg').value;
+            if(!msg) return alert("Please type your query.");
+            await addDoc(collection(db, "complaints"), {
+                tenantId: currentUser.uid,
+                tenantName: currentUser.name,
+                room: currentUser.room,
+                message: msg,
+                status: "Pending",
+                date: serverTimestamp()
+            });
+            alert("Message sent to Admin!");
+            closeModal('compModal');
         };
 
-        window.handleLogout = () => { 
-            signOut(auth).then(() => { 
-                window.location.href = 'index.html'; 
-            }); 
-        };
+        window.openComplaintModal = () => document.getElementById('compModal').style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
     </script>
 </body>
 </html>
