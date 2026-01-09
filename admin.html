@@ -43,9 +43,9 @@
 <body>
 
     <div class="top-nav">
-        <div class="nav-logo">DARSHAN ADMIN</div>
+        <div class="nav-logo">DARSHAN LODGE ADMIN</div>
         <div id="masterOnlyBtn"></div>
-        <button class="btn-gold" onclick="openProfileModal()">👤 Profile</button>
+        <button class="btn-gold" onclick="openProfileModal()">👤 My Profile</button>
     </div>
 
     <div class="admin-header">
@@ -127,7 +127,7 @@
         window.viewTenantDetail = async (uid) => {
             const snap = await getDoc(doc(db, "users", uid));
             const t = snap.data();
-            openModal("Tenant Profile", `
+            openModal("Resident Profile", `
                 <div style="text-align:center; margin-bottom:15px;">
                     <img src="${t.photo || 'https://via.placeholder.com/80'}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); object-fit:cover;">
                 </div>
@@ -140,51 +140,77 @@
                 <label class="edit-label">Bed Number:</label>
                 <input type="number" id="edBed" value="${t.bed}">
                 <div style="display:flex; gap:10px;">
-                   <button class="btn-gold" style="flex:1" onclick="updateTenantRecord('${uid}')">💾 Save Details</button>
-                   <button class="btn-gold" style="flex:1; background:var(--blue); color:white" onclick="viewRentHistory('${uid}', '${t.name}')">📜 Rent History</button>
+                   <button class="btn-gold" style="flex:1" onclick="updateTenantRecord('${uid}')">💾 Save Changes</button>
+                   <button class="btn-gold" style="flex:1; background:var(--blue); color:white" onclick="viewRentHistory('${uid}', '${t.name}')">📜 History</button>
                 </div>
                 <button class="btn-gold" style="width:100%; margin-top:10px; background:var(--green); color:white" onclick="initiatePayment('${uid}', ${t.totalDue})">💸 Receive Rent</button>
                 <div style="margin-top:15px; border-top:1px solid #333; padding-top:10px;">
-                    <p style="font-size:0.8rem">Aadhar Preview (Click to open):</p>
+                    <p style="font-size:0.8rem">Aadhar Preview (Click image to view):</p>
                     <img src="${t.aadharPhoto}" style="width:100%; border-radius:10px; cursor:pointer;" onclick="window.open('${t.aadharPhoto}', '_blank')">
                 </div>
             `);
         };
 
-        // FIXED: Rent History now shows all payments regardless of archived status
         window.viewRentHistory = async (uid, name) => {
-    try {
-        // Humne orderBy ko thoda change kiya hai taaki default index se conflict na ho
-        const q = query(
-            collection(db, "payments"), 
-            where("tenantId", "==", uid), 
-            orderBy("date", "desc"), 
-            limit(5)
-        );
-        const snap = await getDocs(q);
-        let rows = "";
-        
-        if (snap.empty) {
-            rows = '<tr><td colspan="3" style="text-align:center;">No recent payments found</td></tr>';
-        } else {
-            snap.forEach(d => {
-                const p = d.data();
-                const dt = p.date ? p.date.toDate().toLocaleDateString('en-GB') : 'N/A';
-                rows += `<tr><td>${dt}</td><td style="color:var(--green); font-weight:bold;">₹${p.amount}</td><td>${p.type}</td></tr>`;
-            });
-        }
+            try {
+                // Limit removed to show full history
+                const q = query(
+                    collection(db, "payments"), 
+                    where("tenantId", "==", uid), 
+                    orderBy("date", "desc")
+                );
+                const snap = await getDocs(q);
+                let rows = "";
+                
+                if (snap.empty) {
+                    rows = '<tr><td colspan="3" style="text-align:center;">No history found</td></tr>';
+                } else {
+                    snap.forEach(d => {
+                        const p = d.data();
+                        const dt = p.date ? p.date.toDate().toLocaleDateString('en-GB') : 'N/A';
+                        rows += `<tr><td>${dt}</td><td style="color:var(--green); font-weight:bold;">₹${p.amount}</td><td>${p.type}</td></tr>`;
+                    });
+                }
 
-        openModal(`Recent Paid Rent: ${name}`, `
-            <table class="history-table">
-                <thead><tr style="font-size:0.7rem; opacity:0.6;"><td style="padding-bottom:5px;">DATE</td><td style="padding-bottom:5px;">AMOUNT</td><td style="padding-bottom:5px;">METHOD</td></tr></thead>
-                <tbody>${rows}</tbody>
-            </table>
-        `);
-    } catch (e) {
-        console.error("Index Building Error:", e);
-        alert("Bhai, index build ho raha hai ya phir link se naya index banayein.");
-    }
-};
+                openModal(`Rent History: ${name}`, `
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <table class="history-table">
+                            <thead><tr style="font-size:0.7rem; opacity:0.6;"><td style="padding-bottom:5px;">DATE</td><td style="padding-bottom:5px;">AMOUNT</td><td style="padding-bottom:5px;">METHOD</td></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                    <hr style="opacity:0.1; margin:15px 0;">
+                    <button class="btn-red" style="width:100%; font-size:0.8rem;" onclick="eraseTenantHistory('${uid}', '${name}')">🗑️ Erase All Records</button>
+                `);
+            } catch (e) {
+                console.error("History Access Error:", e);
+                alert("History loading error. Please ensure database index is active.");
+            }
+        };
+
+        window.eraseTenantHistory = async (uid, name) => {
+            if (currentAdmin.email !== 'marquesjoe07@gmail.com') {
+                return alert("Access Denied: Only Master Admin can erase payment logs.");
+            }
+
+            if (confirm(`WARNING: Are you sure you want to permanently delete ALL payment records for ${name}?`)) {
+                try {
+                    const q = query(collection(db, "payments"), where("tenantId", "==", uid));
+                    const snap = await getDocs(q);
+                    
+                    const deletePromises = [];
+                    snap.forEach(docSnap => {
+                        deletePromises.push(deleteDoc(doc(db, "payments", docSnap.id)));
+                    });
+
+                    await Promise.all(deletePromises);
+                    alert("Records erased successfully.");
+                    closeModal();
+                } catch (e) {
+                    alert("Erase error: " + e.message);
+                }
+            }
+        };
 
         window.updateTenantRecord = async (uid) => {
             const name = document.getElementById('edName').value;
@@ -192,41 +218,42 @@
             const room = document.getElementById('edRoom').value;
             const bed = document.getElementById('edBed').value;
             await updateDoc(doc(db, "users", uid), { name, phone, room, bed });
-            alert("Tenant Details Updated!"); loadRooms(); closeModal();
+            alert("Record Updated!"); loadRooms(); closeModal();
         };
 
         window.openProfileModal = () => {
-            openModal("My Profile", `
+            openModal("Admin Profile", `
                 <div style="text-align:center;">
                     <img src="${currentAdmin.photo || 'https://via.placeholder.com/80'}" id="admPhotoPreview" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--gold); object-fit:cover; margin-bottom:10px;">
                     <p style="margin:0;"><b>${currentAdmin.name}</b></p>
                     <p style="font-size:0.7rem; opacity:0.5; margin-bottom:15px;">${currentAdmin.email}</p>
                     
-                    <label class="edit-label" style="text-align:left;">Option 1: Paste URL</label>
-                    <input type="text" id="newAdmPhoto" placeholder="JPG/PNG Link">
-                    <button class="btn-gold" style="width:100%; margin-bottom:15px;" onclick="updateAdminPhoto()">Save Link Photo</button>
+                    <label class="edit-label" style="text-align:left;">Manual URL Update:</label>
+                    <input type="text" id="newAdmPhoto" placeholder="Paste image link">
+                    <button class="btn-gold" style="width:100%; margin-bottom:12px;" onclick="updateAdminPhoto()">Save URL Image</button>
 
-                    <label class="edit-label" style="text-align:left;">Option 2: From Gallery</label>
+                    <label class="edit-label" style="text-align:left;">Quick Gallery Upload:</label>
                     <input type="file" id="galleryBtn" accept="image/*" style="display:none" onchange="uploadFromGallery(this)">
-                    <button class="btn-gold" style="width:100%; background:#444; color:white;" onclick="document.getElementById('galleryBtn').click()">📁 Choose Photo</button>
+                    <button class="btn-gold" style="width:100%; background:#444; color:white;" onclick="document.getElementById('galleryBtn').click()">📁 Choose from Phone</button>
                     
-                    <button class="btn-red" style="width:100%; margin-top:30px" onclick="handleLogout()">LOGOUT SESSION</button>
+                    <button class="btn-red" style="width:100%; margin-top:25px" onclick="handleLogout()">LOGOUT</button>
                 </div>
             `);
         };
 
-        // FIXED: indexOf error removed by ensuring value exists and using direct logic
         window.updateAdminPhoto = async () => {
             const photoInput = document.getElementById('newAdmPhoto');
             const photo = photoInput ? photoInput.value.trim() : "";
-            if(!photo) return alert("URL dalo bhai!");
-            if(photo.toLowerCase().indexOf("photos.app.goo.gl") > -1) return alert("Google Photos link website mein kaam nahi karega.");
+            if(!photo) return alert("Please provide a valid URL.");
+            
+            // Fixed logic to avoid indexOf errors on undefined values
+            if(photo.toLowerCase().includes("photos.app.goo.gl")) return alert("Google Photos links are not compatible. Use gallery upload.");
 
             try {
                 await updateDoc(doc(db, "users", currentAdmin.uid), { photo: photo });
-                alert("🎉 Profile Photo Updated!");
+                alert("Profile Photo Updated!");
                 location.reload();
-            } catch(e) { alert("Error: " + e.message); }
+            } catch(e) { alert("Update Error: " + e.message); }
         };
 
         window.uploadFromGallery = (input) => {
@@ -234,19 +261,19 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = async (e) => {
-                    const base64Photo = e.target.result;
+                    const baseBase64 = e.target.result;
                     try {
-                        await updateDoc(doc(db, "users", currentAdmin.uid), { photo: base64Photo });
-                        alert("🎉 Profile Photo Updated from Gallery!");
+                        await updateDoc(doc(db, "users", currentAdmin.uid), { photo: baseBase64 });
+                        alert("Profile Photo Updated!");
                         location.reload();
-                    } catch(err) { alert("Error: " + err.message); }
+                    } catch(err) { alert("Upload Error: " + err.message); }
                 };
                 reader.readAsDataURL(file);
             }
         };
 
         window.handleLogout = async () => {
-            if(confirm("Logout karna hai?")) {
+            if(confirm("Are you sure you want to logout?")) {
                 await signOut(auth);
                 window.location.href = 'index.html';
             }
@@ -257,16 +284,16 @@
             let options = `<option value="all">Apply to ALL Tenants</option>`;
             snap.forEach(d => options += `<option value="${d.id}">${d.data().name} (R:${d.data().room})</option>`);
             openModal("Add Monthly Rent", `
-                <label class="edit-label">Select Target:</label>
+                <label class="edit-label">Target Resident:</label>
                 <select id="rt">${options}</select>
-                <label class="edit-label">Amount (₹):</label>
-                <input type="number" id="ra" placeholder="Enter amount">
-                <button class="btn-gold" style="width:100%" onclick="processRent()">Add to Balance</button>`);
+                <label class="edit-label">Rent Amount (₹):</label>
+                <input type="number" id="ra" placeholder="0.00">
+                <button class="btn-gold" style="width:100%" onclick="processRent()">Apply Rent</button>`);
         };
 
         window.processRent = async () => {
             const t = document.getElementById('rt').value, a = Number(document.getElementById('ra').value);
-            if(!a) return alert("Amount dalo bhai!");
+            if(!a) return alert("Amount required.");
             if(t === "all") {
                 const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
                 for (const d of snap.docs) { await updateDoc(doc(db, "users", d.id), { totalDue: (d.data().totalDue || 0) + a }); }
@@ -275,45 +302,50 @@
                 const dSnap = await getDoc(docRef);
                 await updateDoc(docRef, { totalDue: (dSnap.data().totalDue || 0) + a });
             }
-            alert("Rent Added Successfully!"); loadRooms(); closeModal();
+            alert("Rent Added!"); loadRooms(); closeModal();
         };
 
         window.initiatePayment = (uid, due) => {
-            openModal("Receive Payment", `
-                <label class="edit-label">Received Amount (₹):</label>
-                <input type="number" id="pa" placeholder="Current Due: ₹${due}">
-                <label class="edit-label">Date Received:</label>
+            openModal("Settle Dues", `
+                <label class="edit-label">Payment Amount (₹):</label>
+                <input type="number" id="pa" placeholder="Current Balance: ₹${due}">
+                <label class="edit-label">Receipt Date:</label>
                 <input type="date" id="pd" value="${new Date().toISOString().split('T')[0]}">
-                <button class="btn-gold" style="width:100%" onclick="savePayment('${uid}', ${due})">Verify & Record</button>
+                <button class="btn-gold" style="width:100%" onclick="savePayment('${uid}', ${due})">Confirm Receipt</button>
             `);
         };
 
         window.savePayment = async (uid, due) => {
             const a = Number(document.getElementById('pa').value), d = document.getElementById('pd').value;
-            if(!a || !d) return alert("Details bhariye!");
+            if(!a || !d) return alert("Details missing.");
             await updateDoc(doc(db, "users", uid), { totalDue: due - a });
-            // Payment recorded with archived: false by default
-            await addDoc(collection(db, "payments"), { tenantId: uid, amount: a, type: "Manual", date: new Date(d), archived: false });
-            alert("Payment Verified!"); loadRooms(); closeModal();
+            await addDoc(collection(db, "payments"), { 
+                tenantId: uid, 
+                amount: a, 
+                type: "Manual", 
+                date: new Date(d), 
+                archived: false 
+            });
+            alert("Payment Logged!"); loadRooms(); closeModal();
         };
 
         window.calculateMonthlyCollection = async () => {
             const snap = await getDocs(collection(db, "payments"));
             let total = 0;
             snap.forEach(d => { if(!d.data().archived) total += Number(d.data().amount); });
-            openModal("Monthly Finance Report", `
+            openModal("Monthly Finance", `
                 <div style="text-align:center;">
                     <h1 style="color:var(--green); font-size:2.5rem;">₹${total}</h1>
-                    <p style="opacity:0.6">Total Collected in this cycle</p>
+                    <p style="opacity:0.6">Total Revenue (Current Cycle)</p>
                     <hr style="opacity:0.1; margin:20px 0;">
-                    <button class="btn-red" style="width:100%" onclick="resetReportOnly()">🔄 Reset This Total to 0</button>
+                    <button class="btn-red" style="width:100%" onclick="resetReportOnly()">🔄 Reset Revenue Tracker</button>
                 </div>
             `);
         };
 
         window.resetReportOnly = async () => {
-           if(currentAdmin.email !== 'marquesjoe07@gmail.com') return alert("Only Master Admin can do this!");
-           if(confirm("Confirm reset? This won't delete ledger history but reset this report.")) {
+           if(currentAdmin.email !== 'marquesjoe07@gmail.com') return alert("Master Admin access only.");
+           if(confirm("Confirm revenue reset? (This will not delete individual histories).")) {
                const snap = await getDocs(collection(db, "payments"));
                for (const d of snap.docs) { await updateDoc(doc(db, "payments", d.id), { archived: true }); }
                alert("Finance Report Reset!"); closeModal();
@@ -321,10 +353,10 @@
         };
 
         window.resetMonthFull = async () => {
-            if(confirm("DANGER: Reset all tenant balances to ₹0?")) {
+            if(confirm("DANGER: Clear all tenant balances to ₹0?")) {
                 const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
                 for (const tDoc of snap.docs) { await updateDoc(doc(db, "users", tDoc.id), { totalDue: 0 }); }
-                alert("All Resident Dues Cleared!"); loadRooms();
+                alert("Balances Cleared."); loadRooms();
             }
         };
 
@@ -343,13 +375,13 @@
                     </div>`;
                 }
             });
-            openModal("Resident Directory", h || "No tenants found");
+            openModal("Resident Directory", h || "Empty directory.");
         };
 
         window.deleteTenant = async (id) => {
-            if(confirm("Bhai, confirm delete? Tenant ka data udd jayega.")) {
+            if(confirm("Are you sure? This tenant will be permanently removed.")) {
                 await deleteDoc(doc(db, "users", id));
-                alert("Deleted Successfully"); loadRooms(); closeModal();
+                alert("Resident Removed."); loadRooms(); closeModal();
             }
         };
 
@@ -366,7 +398,7 @@
                     </div>
                 </div>`;
             });
-            openModal("Registration Approvals", html || "Nothing to approve!");
+            openModal("New Registrations", html || "Zero pending requests.");
         };
 
         window.approveUser = async (uid, n, e, p, pr, photo) => {
@@ -378,28 +410,28 @@
         };
 
         window.rejectUser = async (id) => {
-            if(confirm("Reject registration?")) { await deleteDoc(doc(db, "pending_requests", id)); location.reload(); }
+            if(confirm("Reject this request?")) { await deleteDoc(doc(db, "pending_requests", id)); location.reload(); }
         };
 
         window.openSubAdminModal = () => {
-            openModal("Create Sub-Admin", `
-                <label class="edit-label">Admin Name:</label>
-                <input type="text" id="sn" placeholder="Full Name">
-                <label class="edit-label">Admin Email:</label>
-                <input type="email" id="se" placeholder="email@darshan.com">
-                <label class="edit-label">Assign Password:</label>
-                <input type="password" id="sp" placeholder="Min 6 characters">
-                <button class="btn-gold" style="width:100%" onclick="saveSubAdminManual()">Create Account</button>
+            openModal("Create Admin", `
+                <label class="edit-label">Full Name:</label>
+                <input type="text" id="sn" placeholder="John Doe">
+                <label class="edit-label">Login Email:</label>
+                <input type="email" id="se" placeholder="admin@darshan.com">
+                <label class="edit-label">Secure Password:</label>
+                <input type="password" id="sp" placeholder="******">
+                <button class="btn-gold" style="width:100%" onclick="saveSubAdminManual()">Authorize Admin</button>
             `);
         };
 
         window.saveSubAdminManual = async () => {
             const n=document.getElementById('sn').value, e=document.getElementById('se').value, p=document.getElementById('sp').value;
-            if(!n || !e || !p) return alert("Sab kuch bharo!");
+            if(!n || !e || !p) return alert("All fields mandatory.");
             try {
                 const res = await createUserWithEmailAndPassword(auth, e, p);
                 await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, name: n, email: e, role: 'sub-admin', photo: "" });
-                alert("Sub-Admin Created!"); closeModal();
+                alert("Sub-Admin Registered."); closeModal();
             } catch(err) { alert(err.message); }
         };
 
