@@ -192,15 +192,25 @@
         };
 
         window.updateAdminPhoto = async () => {
-            const photo = document.getElementById('newAdmPhoto').value;
-            if(!photo) return alert("Bhai, URL toh dalo!");
-            try {
-                await updateDoc(doc(db, "users", currentAdmin.uid), { photo: photo });
-                currentAdmin.photo = photo;
-                document.getElementById('admPhotoPreview').src = photo;
-                alert("Profile Photo Updated!");
-            } catch(e) { alert("Error: " + e.message); }
-        };
+    const photoInput = document.getElementById('newAdmPhoto');
+    const photo = photoInput ? photoInput.value.trim() : "";
+    
+    if(!photo) return alert("Bhai, Direct Image Link dalo!");
+    
+    // Safety check for Google Photos link
+    if(photo.includes("photos.app.goo.gl")) {
+        alert("Google Photos link website mein kaam nahi karega. Please Imgur ya PostImages ka 'Direct Link' use karein.");
+        return;
+    }
+
+    try {
+        await updateDoc(doc(db, "users", currentAdmin.uid), { photo: photo });
+        alert("Profile Photo Updated!");
+        location.reload(); // Turant refresh taaki nayi photo dikhe
+    } catch(e) { 
+        alert("Error updating photo: " + e.message); 
+    }
+};
 
         window.handleLogout = async () => {
             if(confirm("Logout karna hai?")) {
