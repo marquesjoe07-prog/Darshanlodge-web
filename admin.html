@@ -35,7 +35,7 @@
         .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; overflow: hidden; }
         .history-table td { padding: 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        .edit-label { font-size: 0.75rem; color: var(--gold); margin-bottom: 4px; margin-left: 5px; font-weight: 600;}
+        .edit-label { font-size: 0.75rem; color: var(--gold); margin-bottom: 4px; margin-left: 5px; font-weight: 600; display: block;}
         input, select { width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; box-sizing: border-box; }
         footer { text-align: center; padding: 25px; font-size: 0.75rem; opacity: 0.5; color: var(--gold); }
     </style>
@@ -95,7 +95,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const snap = await getDoc(doc(db, "users", user.uid));
-                currentAdmin = snap.data();
+                currentAdmin = { ...snap.data(), uid: user.uid };
                 document.getElementById('greetMsg').innerText = `Hello! ${currentAdmin.name}`;
                 document.getElementById('roleMsg').innerText = user.email === 'marquesjoe07@gmail.com' ? 'Master Admin' : 'Sub Admin';
                 if(user.email === 'marquesjoe07@gmail.com') {
@@ -151,21 +151,26 @@
             `);
         };
 
+        // FIXED: Rent History now shows all payments regardless of archived status
         window.viewRentHistory = async (uid, name) => {
-            const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc"), limit(5));
-            const snap = await getDocs(q);
-            let rows = "";
-            snap.forEach(d => {
-                const p = d.data();
-                const dt = p.date.toDate().toLocaleDateString('en-GB');
-                rows += `<tr><td>${dt}</td><td style="color:var(--green); font-weight:bold;">₹${p.amount}</td><td>${p.type}</td></tr>`;
-            });
-            openModal(`Recent Paid Rent: ${name}`, `
-                <table class="history-table">
-                    <thead><tr style="font-size:0.7rem; opacity:0.6;"><td style="padding-bottom:5px;">DATE</td><td style="padding-bottom:5px;">AMOUNT</td><td style="padding-bottom:5px;">METHOD</td></tr></thead>
-                    <tbody>${rows || '<tr><td colspan="3" style="text-align:center;">No recent payments found</td></tr>'}</tbody>
-                </table>
-            `);
+            try {
+                const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc"), limit(5));
+                const snap = await getDocs(q);
+                let rows = "";
+                snap.forEach(d => {
+                    const p = d.data();
+                    const dt = p.date ? p.date.toDate().toLocaleDateString('en-GB') : 'N/A';
+                    rows += `<tr><td>${dt}</td><td style="color:var(--green); font-weight:bold;">₹${p.amount}</td><td>${p.type}</td></tr>`;
+                });
+                openModal(`Recent Paid Rent: ${name}`, `
+                    <table class="history-table">
+                        <thead><tr style="font-size:0.7rem; opacity:0.6;"><td style="padding-bottom:5px;">DATE</td><td style="padding-bottom:5px;">AMOUNT</td><td style="padding-bottom:5px;">METHOD</td></tr></thead>
+                        <tbody>${rows || '<tr><td colspan="3" style="text-align:center;">No recent payments found</td></tr>'}</tbody>
+                    </table>
+                `);
+            } catch (e) {
+                alert("History Error: " + e.message);
+            }
         };
 
         window.updateTenantRecord = async (uid) => {
@@ -184,24 +189,25 @@
                     <p style="margin:0;"><b>${currentAdmin.name}</b></p>
                     <p style="font-size:0.7rem; opacity:0.5; margin-bottom:15px;">${currentAdmin.email}</p>
                     
-                    <label class="edit-label" style="display:block; text-align:left;">Photo Option 1: URL Link</label>
-                    <input type="text" id="newAdmPhoto" placeholder="Paste JPG/PNG link here">
-                    
-                    <label class="edit-label" style="display:block; text-align:left;">Photo Option 2: From Gallery</label>
+                    <label class="edit-label" style="text-align:left;">Option 1: Paste URL</label>
+                    <input type="text" id="newAdmPhoto" placeholder="JPG/PNG Link">
+                    <button class="btn-gold" style="width:100%; margin-bottom:15px;" onclick="updateAdminPhoto()">Save Link Photo</button>
+
+                    <label class="edit-label" style="text-align:left;">Option 2: From Gallery</label>
                     <input type="file" id="galleryBtn" accept="image/*" style="display:none" onchange="uploadFromGallery(this)">
-                    <button class="btn-gold" style="width:100%; background:#444; color:white; margin-bottom:15px;" onclick="document.getElementById('galleryBtn').click()">📁 Choose from Phone Gallery</button>
+                    <button class="btn-gold" style="width:100%; background:#444; color:white;" onclick="document.getElementById('galleryBtn').click()">📁 Choose Photo</button>
                     
-                    <button class="btn-gold" style="width:100%" onclick="updateAdminPhoto()">Save URL Photo</button>
-                    <button class="btn-red" style="width:100%; margin-top:20px" onclick="handleLogout()">LOGOUT SESSION</button>
+                    <button class="btn-red" style="width:100%; margin-top:30px" onclick="handleLogout()">LOGOUT SESSION</button>
                 </div>
             `);
         };
 
+        // FIXED: indexOf error removed by ensuring value exists and using direct logic
         window.updateAdminPhoto = async () => {
             const photoInput = document.getElementById('newAdmPhoto');
             const photo = photoInput ? photoInput.value.trim() : "";
-            if(!photo) return alert("Bhai, photo ka URL dalo!");
-            if(photo.includes("photos.app.goo.gl")) return alert("Google Photos link website mein kaam nahi karega. Please Gallery upload use karein.");
+            if(!photo) return alert("URL dalo bhai!");
+            if(photo.toLowerCase().indexOf("photos.app.goo.gl") > -1) return alert("Google Photos link website mein kaam nahi karega.");
 
             try {
                 await updateDoc(doc(db, "users", currentAdmin.uid), { photo: photo });
@@ -252,8 +258,9 @@
                 const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
                 for (const d of snap.docs) { await updateDoc(doc(db, "users", d.id), { totalDue: (d.data().totalDue || 0) + a }); }
             } else {
-                const d = await getDoc(doc(db, "users", t));
-                await updateDoc(doc(db, "users", t), { totalDue: (d.data().totalDue || 0) + a });
+                const docRef = doc(db, "users", t);
+                const dSnap = await getDoc(docRef);
+                await updateDoc(docRef, { totalDue: (dSnap.data().totalDue || 0) + a });
             }
             alert("Rent Added Successfully!"); loadRooms(); closeModal();
         };
@@ -272,6 +279,7 @@
             const a = Number(document.getElementById('pa').value), d = document.getElementById('pd').value;
             if(!a || !d) return alert("Details bhariye!");
             await updateDoc(doc(db, "users", uid), { totalDue: due - a });
+            // Payment recorded with archived: false by default
             await addDoc(collection(db, "payments"), { tenantId: uid, amount: a, type: "Manual", date: new Date(d), archived: false });
             alert("Payment Verified!"); loadRooms(); closeModal();
         };
@@ -302,7 +310,7 @@
         window.resetMonthFull = async () => {
             if(confirm("DANGER: Reset all tenant balances to ₹0?")) {
                 const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
-                for (const d of snap.docs) { await updateDoc(doc(db, "users", d.id), { totalDue: 0 }); }
+                for (const tDoc of snap.docs) { await updateDoc(doc(db, "users", tDoc.id), { totalDue: 0 }); }
                 alert("All Resident Dues Cleared!"); loadRooms();
             }
         };
