@@ -15,9 +15,12 @@
         body { margin: 0; background: var(--dark); color: white; font-family: 'Poppins', sans-serif; min-height: 100vh; padding-top: 80px; }
 
         /* Premium Top Nav */
-        .top-nav { height: 75px; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
-        .nav-logo { font-weight: 800; color: var(--gold); letter-spacing: 3px; font-size: 0.9rem; }
-        .avatar-circle { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); overflow: hidden; cursor: pointer; background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); }
+        .top-nav { height: 75px; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
+        .nav-brand { display: flex; align-items: center; gap: 10px; }
+        .nav-logo-img { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--gold); }
+        .nav-title { font-weight: 800; color: var(--gold); letter-spacing: 2px; font-size: 0.85rem; }
+        
+        .avatar-circle { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); overflow: hidden; cursor: pointer; background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
         .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
 
         .container { max-width: 500px; margin: auto; padding: 20px; box-sizing: border-box; }
@@ -28,9 +31,10 @@
         .greeting-card h2 { margin: 5px 0; font-size: 1.8rem; color: var(--gold); font-weight: 700; text-transform: capitalize; }
 
         /* Balance Card */
-        .balance-card { background: linear-gradient(145deg, #001a33, #000814); border-radius: 25px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .balance-card { background: linear-gradient(145deg, #001a33, #000814); border-radius: 25px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-bottom: 25px; position: relative; overflow: hidden; }
+        .balance-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: var(--gold-glow); filter: blur(100px); opacity: 0.1; }
         .balance-card span { font-size: 0.7rem; text-transform: uppercase; opacity: 0.5; letter-spacing: 2px; }
-        .balance-card h1 { font-size: 3.2rem; margin: 10px 0; font-weight: 800; text-shadow: 0 0 15px rgba(255,255,255,0.1); }
+        .balance-card h1 { font-size: 3.2rem; margin: 10px 0; font-weight: 800; }
         .status-pill { display: inline-block; padding: 6px 15px; border-radius: 50px; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); font-size: 0.7rem; font-weight: 600; margin: 5px; }
 
         /* Action Grid */
@@ -38,7 +42,7 @@
         .btn-action { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.2); padding: 15px; border-radius: 18px; color: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 600; }
         .btn-action:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); transform: translateY(-3px); }
 
-        /* Tables (History & Admin) */
+        /* Tables */
         .section-title { font-size: 0.75rem; color: var(--gold); margin: 30px 0 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; border-left: 3px solid var(--gold); padding-left: 10px;}
         .table-card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; }
@@ -62,7 +66,10 @@
 <body>
 
     <div class="top-nav">
-        <div class="nav-logo">TENANT PORTAL</div>
+        <div class="nav-brand">
+            <img src="https://i.postimg.cc/mD6mS9zP/1000004049.png" class="nav-logo-img">
+            <span class="nav-title">TENANT PORTAL</span>
+        </div>
         <div class="avatar-circle" id="userAvatar" onclick="openProfile()">?</div>
     </div>
 
@@ -126,9 +133,10 @@
 
     <div id="profileModal" class="modal">
         <div class="modal-box">
-            <div class="avatar-circle" style="width:70px; height:70px; margin:0 auto 10px; font-size:1.5rem;" id="modalAvatar">?</div>
+            <img src="https://i.postimg.cc/mD6mS9zP/1000004049.png" style="width: 50px; margin-bottom: 10px;">
+            <div class="avatar-circle" style="width:80px; height:80px; margin:0 auto 10px; font-size:1.8rem;" id="modalAvatar">?</div>
             <input type="file" id="photoUpload" style="display:none" accept="image/*" onchange="uploadPhoto(this)">
-            <button class="status-pill" style="cursor:pointer; background:none;" onclick="document.getElementById('photoUpload').click()">Change Profile Photo</button>
+            <button class="status-pill" style="cursor:pointer; background:none;" onclick="document.getElementById('photoUpload').click()">Update Photo</button>
             
             <h2 id="pName" style="color:var(--gold); margin:15px 0 5px;">Name</h2>
             <p id="pEmail" style="font-size:0.75rem; opacity:0.5; margin:0;">email@darshan.com</p>
@@ -190,22 +198,11 @@
             try {
                 const q = query(collection(db, "users"), where("role", "!=", "tenant"));
                 const snap = await getDocs(q);
-                
                 table.innerHTML = "";
-                if(snap.empty) {
-                    table.innerHTML = `<tr><td colspan="2" style="text-align:center;">No authorities listed</td></tr>`;
-                    return;
-                }
-
                 snap.forEach(d => {
                     const data = d.data();
                     const roleLabel = data.email === 'marquesjoe07@gmail.com' ? 'Master Admin' : 'Sub Admin';
-                    table.innerHTML += `
-                        <tr>
-                            <td style="font-weight:600;">${data.name}</td>
-                            <td style="text-align:right;"><span class="role-badge">${roleLabel}</span></td>
-                        </tr>
-                    `;
+                    table.innerHTML += `<tr><td style="font-weight:600;">${data.name}</td><td style="text-align:right;"><span class="role-badge">${roleLabel}</span></td></tr>`;
                 });
             } catch (e) { console.error(e); }
         }
@@ -215,7 +212,6 @@
             document.getElementById('displayDue').innerText = `₹ ${currentUser.totalDue || 0}`;
             document.getElementById('roomPill').innerText = `Room: ${currentUser.room}`;
             document.getElementById('bedPill').innerText = `Bed: ${currentUser.bed}`;
-            
             const avatar = document.getElementById('userAvatar');
             const modAvatar = document.getElementById('modalAvatar');
             if(currentUser.photo) {
@@ -231,38 +227,45 @@
             const tableBody = document.querySelector('#historyTable tbody');
             const q = query(collection(db, "payments"), where("tenantId", "==", currentUser.uid), orderBy("date", "desc"));
             const snap = await getDocs(q);
-            
-            tableBody.innerHTML = "";
-            if(snap.empty) {
-                tableBody.innerHTML = `<tr><td style="text-align:center; opacity:0.5; padding: 20px;">No transactions found</td></tr>`;
-                return;
-            }
-
+            tableBody.innerHTML = snap.empty ? `<tr><td style="text-align:center; opacity:0.5; padding: 20px;">No transactions found</td></tr>` : "";
             snap.forEach(d => {
                 const p = d.data();
                 const date = p.date ? p.date.toDate().toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) : 'N/A';
-                tableBody.innerHTML += `
-                    <tr>
-                        <td>
-                            <div style="font-weight:600;">Rent Payment</div>
-                            <div style="opacity:0.5; font-size:0.7rem;">${date} • ${p.type}</div>
-                        </td>
-                        <td style="text-align:right; font-weight:800; color:var(--green);">₹ ${p.amount}</td>
-                    </tr>
-                `;
+                tableBody.innerHTML += `<tr><td><div style="font-weight:600;">Rent Payment</div><div style="opacity:0.5; font-size:0.7rem;">${date} • ${p.type}</div></td><td style="text-align:right; font-weight:800; color:var(--green);">₹ ${p.amount}</td></tr>`;
             });
         }
 
+        // AUTO-RESIZE LOGIC FOR PROFILE PICTURES
         window.uploadPhoto = (input) => {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = async (e) => {
-                    const base64 = e.target.result;
-                    await updateDoc(doc(db, "users", currentUser.uid), { photo: base64 });
-                    currentUser.photo = base64;
-                    renderDashboard();
-                    alert("Profile Picture Updated!");
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = async () => {
+                        // Canvas setup for resizing
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 300; // Resize to 300px for stability
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Optimized Base64 string
+                        const resizedBase64 = canvas.toDataURL('image/jpeg', 0.7); 
+                        
+                        try {
+                            await updateDoc(doc(db, "users", currentUser.uid), { photo: resizedBase64 });
+                            currentUser.photo = resizedBase64;
+                            renderDashboard();
+                            alert("Profile Picture Set Successfully!");
+                        } catch (err) {
+                            alert("Resize Error: " + err.message);
+                        }
+                    };
                 };
                 reader.readAsDataURL(file);
             }
@@ -270,7 +273,7 @@
 
         window.handlePayment = () => {
             const due = currentUser.totalDue || 0;
-            if (due <= 0) return alert("You have no outstanding dues. Thank you!");
+            if (due <= 0) return alert("No outstanding dues. Thank you!");
             window.location.href = `upi://pay?pa=priyadarshan07@airtel&pn=DarshanLodge&am=${due}&cu=INR`;
         };
 
@@ -288,18 +291,13 @@
             const msg = document.getElementById('compMsg').value;
             if(!msg) return alert("Please type your query.");
             await addDoc(collection(db, "complaints"), {
-                tenantId: currentUser.uid,
-                tenantName: currentUser.name,
-                room: currentUser.room,
-                message: msg,
-                status: "Pending",
-                date: serverTimestamp()
+                tenantId: currentUser.uid, tenantName: currentUser.name, room: currentUser.room,
+                message: msg, status: "Pending", date: serverTimestamp()
             });
             alert("Message sent to Admin!");
             closeModal('compModal');
         };
 
-        window.openComplaintModal = () => document.getElementById('compModal').style.display = 'flex';
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
     </script>
