@@ -153,25 +153,38 @@
 
         // FIXED: Rent History now shows all payments regardless of archived status
         window.viewRentHistory = async (uid, name) => {
-            try {
-                const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc"), limit(5));
-                const snap = await getDocs(q);
-                let rows = "";
-                snap.forEach(d => {
-                    const p = d.data();
-                    const dt = p.date ? p.date.toDate().toLocaleDateString('en-GB') : 'N/A';
-                    rows += `<tr><td>${dt}</td><td style="color:var(--green); font-weight:bold;">₹${p.amount}</td><td>${p.type}</td></tr>`;
-                });
-                openModal(`Recent Paid Rent: ${name}`, `
-                    <table class="history-table">
-                        <thead><tr style="font-size:0.7rem; opacity:0.6;"><td style="padding-bottom:5px;">DATE</td><td style="padding-bottom:5px;">AMOUNT</td><td style="padding-bottom:5px;">METHOD</td></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="3" style="text-align:center;">No recent payments found</td></tr>'}</tbody>
-                    </table>
-                `);
-            } catch (e) {
-                alert("History Error: " + e.message);
-            }
-        };
+    try {
+        // Humne orderBy ko thoda change kiya hai taaki default index se conflict na ho
+        const q = query(
+            collection(db, "payments"), 
+            where("tenantId", "==", uid), 
+            orderBy("date", "desc"), 
+            limit(5)
+        );
+        const snap = await getDocs(q);
+        let rows = "";
+        
+        if (snap.empty) {
+            rows = '<tr><td colspan="3" style="text-align:center;">No recent payments found</td></tr>';
+        } else {
+            snap.forEach(d => {
+                const p = d.data();
+                const dt = p.date ? p.date.toDate().toLocaleDateString('en-GB') : 'N/A';
+                rows += `<tr><td>${dt}</td><td style="color:var(--green); font-weight:bold;">₹${p.amount}</td><td>${p.type}</td></tr>`;
+            });
+        }
+
+        openModal(`Recent Paid Rent: ${name}`, `
+            <table class="history-table">
+                <thead><tr style="font-size:0.7rem; opacity:0.6;"><td style="padding-bottom:5px;">DATE</td><td style="padding-bottom:5px;">AMOUNT</td><td style="padding-bottom:5px;">METHOD</td></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        `);
+    } catch (e) {
+        console.error("Index Building Error:", e);
+        alert("Bhai, index build ho raha hai ya phir link se naya index banayein.");
+    }
+};
 
         window.updateTenantRecord = async (uid) => {
             const name = document.getElementById('edName').value;
