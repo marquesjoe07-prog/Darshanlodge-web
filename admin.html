@@ -183,35 +183,48 @@
                     <img src="${currentAdmin.photo || 'https://via.placeholder.com/80'}" id="admPhotoPreview" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--gold); object-fit:cover; margin-bottom:10px;">
                     <p style="margin:0;"><b>${currentAdmin.name}</b></p>
                     <p style="font-size:0.7rem; opacity:0.5; margin-bottom:15px;">${currentAdmin.email}</p>
-                    <label class="edit-label" style="display:block; text-align:left;">Profile Photo URL:</label>
-                    <input type="text" id="newAdmPhoto" placeholder="Paste link here (e.g. imgur link)">
-                    <button class="btn-gold" style="width:100%" onclick="updateAdminPhoto()">Save Photo</button>
+                    
+                    <label class="edit-label" style="display:block; text-align:left;">Photo Option 1: URL Link</label>
+                    <input type="text" id="newAdmPhoto" placeholder="Paste JPG/PNG link here">
+                    
+                    <label class="edit-label" style="display:block; text-align:left;">Photo Option 2: From Gallery</label>
+                    <input type="file" id="galleryBtn" accept="image/*" style="display:none" onchange="uploadFromGallery(this)">
+                    <button class="btn-gold" style="width:100%; background:#444; color:white; margin-bottom:15px;" onclick="document.getElementById('galleryBtn').click()">📁 Choose from Phone Gallery</button>
+                    
+                    <button class="btn-gold" style="width:100%" onclick="updateAdminPhoto()">Save URL Photo</button>
                     <button class="btn-red" style="width:100%; margin-top:20px" onclick="handleLogout()">LOGOUT SESSION</button>
                 </div>
             `);
         };
 
-         window.updateAdminPhoto = async () => {
-    // Input element ko dhyan se uthana
-          const photoInput = document.getElementById('newAdmPhoto');
-          const photoValue = photoInput ? photoInput.value.trim() : "";
-    
-           if(!photoValue) return alert("Bhai, photo ka direct link dalo!");
+        window.updateAdminPhoto = async () => {
+            const photoInput = document.getElementById('newAdmPhoto');
+            const photo = photoInput ? photoInput.value.trim() : "";
+            if(!photo) return alert("Bhai, photo ka URL dalo!");
+            if(photo.includes("photos.app.goo.gl")) return alert("Google Photos link website mein kaam nahi karega. Please Gallery upload use karein.");
 
-          try {
-        // indexOf error se bachne ke liye hum direct check kar rahe hain
-             if(photoValue.toLowerCase().includes("photos.app.goo.gl")) {
-                  alert("Google Photos link kaam nahi karega. Please PostImages ka 'Direct Link' hi use karein.");
-            return;
+            try {
+                await updateDoc(doc(db, "users", currentAdmin.uid), { photo: photo });
+                alert("🎉 Profile Photo Updated!");
+                location.reload();
+            } catch(e) { alert("Error: " + e.message); }
+        };
+
+        window.uploadFromGallery = (input) => {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const base64Photo = e.target.result;
+                    try {
+                        await updateDoc(doc(db, "users", currentAdmin.uid), { photo: base64Photo });
+                        alert("🎉 Profile Photo Updated from Gallery!");
+                        location.reload();
+                    } catch(err) { alert("Error: " + err.message); }
+                };
+                reader.readAsDataURL(file);
             }
-
-        await updateDoc(doc(db, "users", currentAdmin.uid), { photo: photoValue });
-        alert("🎉 Profile Photo Updated!");
-        location.reload(); // Turant refresh taaki nayi photo dikhe
-         } catch(e) { 
-            alert("Error updating photo: " + e.message); 
-         }
-       };
+        };
 
         window.handleLogout = async () => {
             if(confirm("Logout karna hai?")) {
