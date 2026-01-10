@@ -303,13 +303,22 @@
 
         // --- FORGOT PASSWORD ---
         window.forgotPassword = async () => {
-            const email = document.getElementById('email').value;
-            if(!email) return alert("Bhai, email toh dalo pehle!");
-            try {
-                await sendPasswordResetEmail(auth, email);
-                alert("Reset link sent! Check your inbox.");
-            } catch(err) { alert("Error: " + err.message); }
-        };
+    const email = document.getElementById('email').value;
+    if(!email) return alert("Bhai, pehle email toh dalo!");
+
+    try {
+        alert("Wait kijiye, link bheja ja raha hai...");
+        await sendPasswordResetEmail(auth, email);
+        alert("Success! Link aapki email (" + email + ") par bhej diya gaya hai. Spam folder check karna mat bhoolna!");
+    } catch(err) {
+        if(err.code === 'auth/user-not-found') {
+            alert("Ye email register nahi hai!");
+        } else {
+            alert("Error: " + err.message);
+        }
+    }
+};
+
 
         // --- SIGNUP LOGIC WITH COMPRESSION ---
         window.submitSignup = async () => {
