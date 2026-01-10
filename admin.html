@@ -22,20 +22,27 @@
         .room-card { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
         .room-card h3 { margin: 0 0 15px; color: var(--gold); border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 10px; }
         
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); display: none; z-index: 200; overflow-y: auto; padding: 20px; box-sizing: border-box; align-items: center; justify-content: center;}
-        .modal-box { background: #001529; padding: 30px; border-radius: 25px; border: 1px solid var(--gold); max-width: 500px; width: 100%; box-shadow: 0 0 40px var(--gold-glow); position: relative; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; z-index: 200; overflow-y: auto; padding: 20px; box-sizing: border-box; align-items: flex-start; justify-content: center;}
+        .modal-box { background: #001529; padding: 30px; border-radius: 25px; border: 1px solid var(--gold); max-width: 500px; width: 100%; margin: 40px auto; box-shadow: 0 0 40px var(--gold-glow); }
         
         .btn-gold { background: var(--gold); border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; color: black; font-weight: bold; transition: 0.3s; font-size: 0.85rem; }
-        .btn-red { background: var(--red); color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.8rem;}
+        .btn-red { background: var(--red); color: white; border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; font-weight: bold; }
         .btn-gold:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--gold-glow); }
         
-        .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; overflow: hidden; }
-        .history-table td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tenant-item { background: rgba(255,255,255,0.07); padding: 15px; margin-top: 10px; border-radius: 12px; cursor: pointer; border-left: 4px solid var(--gold); display: flex; align-items: center; gap: 15px; }
+        .profile-img-small { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; background: #222; }
+        
+        .complaint-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid rgba(212, 175, 55, 0.2); }
+        .complaint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+        .status-badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; font-weight: bold; }
 
-        .profile-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 10px; }
-        .edit-pencil { color: var(--gold); cursor: pointer; font-size: 1rem; margin-left: 10px; }
-        .role-badge { background: var(--gold); color: black; padding: 2px 10px; border-radius: 5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        /* Chat Styles */
+        #chatContainer { height: 300px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        .chat-msg { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 0.8rem; position: relative; }
+        .chat-msg b { color: var(--gold); display: block; font-size: 0.7rem; margin-bottom: 2px; }
+        .delete-btn { color: var(--red); cursor: pointer; float: right; font-size: 0.8rem; margin-left: 10px; }
 
+        .edit-label { font-size: 0.75rem; color: var(--gold); margin-bottom: 4px; margin-left: 5px; font-weight: 600; display: block;}
         input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; box-sizing: border-box; font-family: 'Poppins'; }
         footer { text-align: center; padding: 25px; font-size: 0.75rem; opacity: 0.5; color: var(--gold); }
     </style>
@@ -43,14 +50,14 @@
 <body>
 
     <div class="top-nav">
-        <div class="nav-logo">DARSHAN ADMIN</div>
+        <div class="nav-logo">DARSHAN LODGE ADMIN</div>
         <div id="masterOnlyBtn"></div>
-        <button class="btn-gold" onclick="openProfileModal()">👤 Account</button>
+        <button class="btn-gold" onclick="openProfileModal()">👤 My Profile</button>
     </div>
 
     <div class="admin-header">
-        <h2 id="greetMsg">Welcome!</h2>
-        <p id="roleMsg">Initializing Access...</p>
+        <h2 id="greetMsg">Hello Admin!</h2>
+        <p id="roleMsg">Loading...</p>
     </div>
 
     <div class="sidebar">
@@ -58,27 +65,28 @@
         <button class="btn-gold" onclick="loadDirectory()">📞 Directory</button>
         <button class="btn-gold" onclick="loadComplaints()">📢 Complaints</button>
         <button class="btn-gold" onclick="openChatModal()">💬 Chat</button>
-        <button class="btn-gold" style="background:var(--green); color:white;" onclick="openRentModal()">💸 Add Rent</button>
-        <button class="btn-gold" style="background:var(--blue); color:white;" onclick="showFinancialReport()">📊 Report</button>
+        <button class="btn-gold" style="background:var(--green); color:white;" onclick="handleRentAddition()">💸 Add Rent</button>
+        <button class="btn-gold" style="background:var(--blue); color:white;" onclick="calculateMonthlyCollection()">📊 Report</button>
         <button class="btn-red" onclick="resetMonthFull()">🔄 Reset Dues</button>
     </div>
 
     <div id="modal" class="modal">
         <div class="modal-box">
-            <h2 id="modalTitle" style="color:var(--gold); margin-top: 0; text-align: center;">Title</h2>
+            <h2 id="modalTitle" style="color:var(--gold); margin-top: 0;">Title</h2>
             <div id="modalContent"></div>
-            <button class="btn-gold" style="width:100%; margin-top:20px; background: #222; color: white;" onclick="closeModal()">Close Window</button>
+            <button class="btn-gold" style="width:100%; margin-top:20px; background: #333; color: white;" onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <div class="grid" id="roomContainer"></div>
 
-    <footer>©️ 2026 DARSHAN LODGE | OWNER: PDJ</footer>
+    <footer>©️ 2026 ALL RIGHTS RESERVED TO DARSHAN LODGE<br>
+        DESIGNED & MANAGED BY OWNER: PDJ & DARSHAN FAMILY</footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, query, getDocs, doc, setDoc, deleteDoc, updateDoc, getDoc, where, orderBy, addDoc, serverTimestamp, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
@@ -98,149 +106,144 @@
             if (user) {
                 const snap = await getDoc(doc(db, "users", user.uid));
                 currentAdmin = { ...snap.data(), uid: user.uid };
-                const isMaster = user.email === 'marquesjoe07@gmail.com';
-                const role = isMaster ? 'Master Admin' : 'Sub Admin';
-                document.getElementById('greetMsg').innerText = `Namaste, ${currentAdmin.name}`;
-                document.getElementById('roleMsg').innerHTML = `<span class="role-badge">${role}</span>`;
-                if(isMaster) {
+                document.getElementById('greetMsg').innerText = `Hello! ${currentAdmin.name}`;
+                document.getElementById('roleMsg').innerText = user.email === 'marquesjoe07@gmail.com' ? 'Master Admin' : 'Sub Admin';
+                if(user.email === 'marquesjoe07@gmail.com') {
                     document.getElementById('masterOnlyBtn').innerHTML = `<button class="btn-gold" onclick="openSubAdminModal()">➕ Sub-Admin</button>`;
                 }
                 loadRooms();
             } else { window.location.href = 'index.html'; }
         });
 
-        // --- DIRECTORY WITH REMOVE OPTION ---
-        window.loadDirectory = async () => {
-            const snap = await getDocs(collection(db, "users"));
-            let html = "";
-            snap.forEach(d => {
-                const u = d.data();
-                if(u.role === 'tenant') {
-                    html += `<div style="padding:15px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <b>${u.name}</b><br>
-                            <small>Phone: ${u.phone || 'N/A'}</small>
-                        </div>
-                        <button class="btn-red" style="padding:5px 10px; font-size:0.7rem;" onclick="deleteTenant('${d.id}', '${u.name}')">🗑️ REMOVE</button>
-                    </div>`;
-                }
+        // --- GLOBAL RESIZE FUNCTION ---
+        const resizeImage = (file, maxWidth = 300) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = maxWidth / img.width;
+                        canvas.width = maxWidth;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                };
             });
-            openModal("Resident Directory", html || "No residents found.");
         };
 
-        // --- RENT HISTORY (MASTER ONLY DELETE) ---
-        window.viewRentHistory = async (uid, name) => {
-            const isMaster = currentAdmin.email === 'marquesjoe07@gmail.com';
-            const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc"));
-            const snap = await getDocs(q);
-            let rows = "";
-            snap.forEach(d => {
-                const p = d.data();
-                const delBtn = isMaster ? `<span style="color:var(--red); cursor:pointer;" onclick="deleteSingleHistory('${d.id}', '${uid}')">🗑️</span>` : "";
-                rows += `<tr>
-                    <td>${p.date.toDate().toLocaleDateString()}</td>
-                    <td style="color:var(--green); font-weight:bold;">₹${p.amount}</td>
-                    <td>${delBtn}</td>
-                </tr>`;
-            });
-            
-            let eraseBtn = (isMaster && rows) ? `<button class="btn-red" style="width:100%; margin-top:15px;" onclick="eraseAllTenantHistory('${uid}')">💣 ERASE ALL RECORDS</button>` : '';
-            
-            openModal(`Rent Logs: ${name}`, `
-                <div style="max-height:300px; overflow-y:auto;">
-                    <table class="history-table">
-                        <thead><tr style="opacity:0.5; font-size:0.7rem;"><td>DATE</td><td>AMOUNT</td><td>${isMaster ? 'DEL' : ''}</td></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="3">No history</td></tr>'}</tbody>
-                    </table>
-                </div>
-                ${eraseBtn}
-            `);
-        };
-
-        // --- FINANCIAL REPORT (MASTER ONLY RESET) ---
-        window.showFinancialReport = async () => {
-            const isMaster = currentAdmin.email === 'marquesjoe07@gmail.com';
-            const snap = await getDocs(collection(db, "payments"));
-            let total = 0;
-            snap.forEach(d => { if(!d.data().archived) total += Number(d.data().amount); });
-            
-            let resetBtn = isMaster ? `<button class="btn-red" style="width:100%" onclick="resetReportOnly()">🔄 Reset Monthly Tracker</button>` : `<p style="font-size:0.7rem; opacity:0.5;">Only Master Admin can reset this total.</p>`;
-
-            openModal("Finance Overview", `
-                <div style="text-align:center; padding:10px;">
-                    <div style="background:rgba(46,204,113,0.1); border:1px solid var(--green); padding:30px; border-radius:20px; margin-bottom:20px;">
-                        <span style="font-size:0.8rem; opacity:0.7;">TOTAL COLLECTION</span>
-                        <h1 style="color:var(--green); font-size:3rem; margin:10px 0;">₹${total}</h1>
-                    </div>
-                    ${resetBtn}
-                </div>
-            `);
-        };
-
-        // --- TENANT REMOVE LOGIC ---
-        window.deleteTenant = async (id, name) => {
-            if(confirm(`Are you sure you want to permanently remove ${name}? This will delete their profile.`)) {
-                await deleteDoc(doc(db, "users", id));
-                alert("Tenant removed from system.");
-                loadDirectory();
-                loadRooms();
+        window.uploadFromGallery = async (input) => {
+            const file = input.files[0];
+            if (file) {
+                try {
+                    const resizedBase64 = await resizeImage(file);
+                    await updateDoc(doc(db, "users", currentAdmin.uid), { photo: resizedBase64 });
+                    alert("Profile Picture Updated!");
+                    location.reload();
+                } catch(err) { alert("Upload Error: " + err.message); }
             }
         };
 
-        // --- TENANT PROFILE WITH REMOVE OPTION ---
-        window.viewTenantDetail = async (uid) => {
-            const snap = await getDoc(doc(db, "users", uid));
-            const t = snap.data();
-            openModal("Resident Profile", `
-                <div style="text-align:center; margin-bottom:15px;">
-                    <img src="${t.photo || 'https://via.placeholder.com/80'}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); object-fit:cover;">
+        window.openProfileModal = () => {
+            openModal("Admin Profile", `
+                <div style="text-align:center;">
+                    <img src="${currentAdmin.photo || 'https://via.placeholder.com/80'}" id="admPhotoPreview" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--gold); object-fit:cover; margin-bottom:10px;">
+                    <p style="margin:0;"><b>${currentAdmin.name}</b></p>
+                    <p style="font-size:0.7rem; opacity:0.5; margin-bottom:15px;">${currentAdmin.email}</p>
+                    
+                    <label class="edit-label" style="text-align:left;">Manual URL Update:</label>
+                    <input type="text" id="newAdmPhoto" placeholder="Paste link">
+                    <button class="btn-gold" style="width:100%; margin-bottom:12px;" onclick="updateAdminPhoto()">Save Link</button>
+                    
+                    <label class="edit-label" style="text-align:left;">Resize Gallery Upload:</label>
+                    <input type="file" id="galleryBtn" accept="image/*" style="display:none" onchange="uploadFromGallery(this)">
+                    <button class="btn-gold" style="width:100%; background:#444;" onclick="document.getElementById('galleryBtn').click()">📁 Choose Photo</button>
+                    
+                    <button class="btn-red" style="width:100%; margin-top:25px" onclick="handleLogout()">LOGOUT</button>
                 </div>
-                <label class="edit-label">Name:</label>
-                <input id="en" value="${t.name}">
-                <label class="edit-label">Guardian Phone:</label>
-                <input id="ep" value="${t.parentPhone || ''}">
-                <div style="display:flex; gap:10px;">
-                   <button class="btn-gold" style="flex:1" onclick="saveTenantUpdate('${uid}')">Save</button>
-                   <button class="btn-gold" style="flex:1; background:var(--blue);" onclick="viewRentHistory('${uid}','${t.name}')">History</button>
-                </div>
-                <hr style="opacity:0.1; margin:20px 0;">
-                <button class="btn-red" style="width:100%; padding:8px;" onclick="deleteTenant('${uid}', '${t.name}')">🗑️ Permanently Remove Tenant</button>
             `);
         };
 
-        // --- LOGIC HELPERS ---
-        window.saveTenantUpdate = async (uid) => {
-            const name = document.getElementById('en').value;
-            const parent = document.getElementById('ep').value;
-            await updateDoc(doc(db, "users", uid), { name, parentPhone: parent });
-            alert("Updated!"); loadRooms(); closeModal();
+        // --- REAL-TIME CHAT BOX (ADMIN SIDE) ---
+        window.openChatModal = () => {
+            openModal("Community Chat", `
+                <div id="chatContainer"></div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="text" id="adminChatInput" placeholder="Type a message..." style="margin-bottom:0;">
+                    <button class="btn-gold" onclick="sendAdminChat()" style="padding:10px 20px;">Send</button>
+                </div>
+                <button id="clearChatBtn" class="btn-red" style="width:100%; margin-top:15px; display:none; font-size:0.7rem;" onclick="clearAllChats()">🗑️ Clear Global Chat</button>
+            `);
+            if (currentAdmin.email === 'marquesjoe07@gmail.com') document.getElementById('clearChatBtn').style.display = 'block';
+            const q = query(collection(db, "chats"), orderBy("date", "asc"), limit(50));
+            onSnapshot(q, (snap) => {
+                const container = document.getElementById('chatContainer');
+                if (!container) return;
+                container.innerHTML = "";
+                snap.forEach(d => {
+                    const m = d.data();
+                    const del = `<span class="delete-btn" onclick="deleteChatMessage('${d.id}')">🗑️</span>`;
+                    container.innerHTML += `<div class="chat-msg"><b>${m.name}</b> ${m.text} ${del}</div>`;
+                });
+                container.scrollTop = container.scrollHeight;
+            });
         };
 
-        window.deleteSingleHistory = async (payId, uid) => {
-            if(confirm("Delete this entry?")) {
-                await deleteDoc(doc(db, "payments", payId));
-                alert("Deleted!"); closeModal();
+        window.sendAdminChat = async () => {
+            const txt = document.getElementById('adminChatInput').value;
+            if(!txt) return;
+            await addDoc(collection(db, "chats"), { name: currentAdmin.name + " (Admin)", text: txt, date: serverTimestamp() });
+            document.getElementById('adminChatInput').value = "";
+        };
+
+        window.deleteChatMessage = async (id) => { if(confirm("Delete this message?")) await deleteDoc(doc(db, "chats", id)); };
+        
+        window.clearAllChats = async () => {
+            if(confirm("Wipe entire chat history?")) {
+                const snap = await getDocs(collection(db, "chats"));
+                snap.forEach(async d => await deleteDoc(doc(db, "chats", d.id)));
             }
         };
 
-        window.eraseAllTenantHistory = async (uid) => {
-            if(confirm("Wipe all history for this tenant?")) {
-                const q = query(collection(db, "payments"), where("tenantId", "==", uid));
+        window.loadComplaints = async () => {
+            try {
+                const q = query(collection(db, "complaints"), orderBy("date", "desc"));
                 const snap = await getDocs(q);
-                snap.forEach(async d => await deleteDoc(doc(db, "payments", d.id)));
-                alert("History Wiped!"); closeModal();
+                let html = "";
+                if (snap.empty) { html = "<p style='text-align:center; opacity:0.5;'>No complaints yet.</p>"; } 
+                else {
+                    snap.forEach(docSnap => {
+                        const data = docSnap.data();
+                        html += `
+                        <div class="complaint-card">
+                            <div class="complaint-header">
+                                <b>${data.tenantName}</b>
+                                <span class="delete-btn" onclick="deleteComplaint('${docSnap.id}')">🗑️</span>
+                            </div>
+                            <p style="font-size:0.85rem;">${data.message}</p>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button class="btn-gold" style="flex:1; font-size:0.7rem;" onclick="replyToComplaint('${docSnap.id}')">Reply</button>
+                                <button class="btn-gold" style="background:var(--green); flex:0.3;" onclick="resolveAndDeleteComplaint('${docSnap.id}')">✔️</button>
+                            </div>
+                        </div>`;
+                    });
+                }
+                openModal("📢 Complaints Panel", html);
+            } catch (e) { alert(e.message); }
+        };
+
+        window.deleteComplaint = async (id) => { if(confirm("Permanent delete?")) { await deleteDoc(doc(db, "complaints", id)); loadComplaints(); } };
+        window.resolveAndDeleteComplaint = async (id) => {
+            if(confirm("Mark as Resolved and remove?")) {
+                await deleteDoc(doc(db, "complaints", id));
+                alert("Resolved!"); loadComplaints();
             }
         };
 
-        window.resetReportOnly = async () => {
-            if(confirm("Reset monthly revenue total?")) {
-                const snap = await getDocs(collection(db, "payments"));
-                snap.forEach(async d => await updateDoc(doc(db, "payments", d.id), { archived: true }));
-                alert("Report Reset!"); closeModal();
-            }
-        };
-
-        // Standard Functions
         window.loadRooms = async () => {
             const snap = await getDocs(collection(db, "users"));
             const container = document.getElementById('roomContainer');
@@ -258,6 +261,139 @@
                 });
                 container.innerHTML += `<div class="room-card"><h3>Room ${i}</h3>${tenantsHtml || '<p style="opacity:0.4">Vacant</p>'}</div>`;
             }
+        };
+
+        window.viewTenantDetail = async (uid) => {
+            const snap = await getDoc(doc(db, "users", uid));
+            const t = snap.data();
+            openModal("Resident Profile", `<div style="text-align:center; margin-bottom:15px;"><img src="${t.photo || 'https://via.placeholder.com/80'}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); object-fit:cover;"></div><label class="edit-label">Name:</label><input type="text" id="edName" value="${t.name}"><label class="edit-label">Phone:</label><input type="text" id="edPhone" value="${t.phone || ''}"><label class="edit-label">Room:</label><input type="number" id="edRoom" value="${t.room}"><label class="edit-label">Bed:</label><input type="number" id="edBed" value="${t.bed}"><div style="display:flex; gap:10px;"><button class="btn-gold" style="flex:1" onclick="updateTenantRecord('${uid}')">💾 Save</button><button class="btn-gold" style="flex:1; background:var(--blue);" onclick="viewRentHistory('${uid}', '${t.name}')">📜 History</button></div><button class="btn-gold" style="width:100%; margin-top:10px; background:var(--green);" onclick="initiatePayment('${uid}', ${t.totalDue})">💸 Receive Rent</button>`);
+        };
+
+        window.viewRentHistory = async (uid, name) => {
+            const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc"));
+            const snap = await getDocs(q);
+            let rows = "";
+            snap.forEach(d => { const p = d.data(); const dt = p.date ? p.date.toDate().toLocaleDateString('en-GB') : 'N/A'; rows += `<tr><td>${dt}</td><td style="color:var(--green); font-weight:bold;">₹${p.amount}</td><td>${p.type}</td></tr>`; });
+            openModal(`Rent History: ${name}`, `<div style="max-height:300px; overflow-y:auto;"><table class="history-table"><tbody>${rows || '<tr><td colspan="3">No history</td></tr>'}</tbody></table></div><hr style="opacity:0.1; margin:15px 0;"><button class="btn-red" style="width:100%; font-size:0.8rem;" onclick="eraseTenantHistory('${uid}', '${name}')">🗑️ Erase All Records</button>`);
+        };
+
+        window.eraseTenantHistory = async (uid, name) => {
+            if (currentAdmin.email !== 'marquesjoe07@gmail.com') return alert("Master Admin only!");
+            if (confirm(`Delete ALL records for ${name}?`)) {
+                const q = query(collection(db, "payments"), where("tenantId", "==", uid));
+                const snap = await getDocs(q);
+                snap.forEach(async d => await deleteDoc(doc(db, "payments", d.id)));
+                alert("Records erased."); closeModal();
+            }
+        };
+
+        window.updateTenantRecord = async (uid) => {
+            const name = document.getElementById('edName').value, phone = document.getElementById('edPhone').value, room = document.getElementById('edRoom').value, bed = document.getElementById('edBed').value;
+            await updateDoc(doc(db, "users", uid), { name, phone, room, bed });
+            alert("Updated!"); loadRooms(); closeModal();
+        };
+
+        window.updateAdminPhoto = async () => {
+            const photo = document.getElementById('newAdmPhoto').value.trim();
+            if(!photo) return alert("URL required.");
+            await updateDoc(doc(db, "users", currentAdmin.uid), { photo: photo });
+            alert("Updated!"); location.reload();
+        };
+
+        window.handleLogout = async () => { if(confirm("Logout?")) { await signOut(auth); window.location.href = 'index.html'; } };
+
+        window.handleRentAddition = async () => {
+            const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
+            let options = `<option value="all">Apply to ALL Tenants</option>`;
+            snap.forEach(d => options += `<option value="${d.id}">${d.data().name} (R:${d.data().room})</option>`);
+            openModal("Add Rent", `<label class="edit-label">Target:</label><select id="rt">${options}</select><label class="edit-label">Amount (₹):</label><input type="number" id="ra" placeholder="0.00"><button class="btn-gold" style="width:100%" onclick="processRent()">Apply Rent</button>`);
+        };
+
+        window.processRent = async () => {
+            const t = document.getElementById('rt').value, a = Number(document.getElementById('ra').value);
+            if(t === "all") {
+                const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
+                snap.forEach(async d => await updateDoc(doc(db, "users", d.id), { totalDue: (d.data().totalDue || 0) + a }));
+            } else {
+                const docRef = doc(db, "users", t), dSnap = await getDoc(docRef);
+                await updateDoc(docRef, { totalDue: (dSnap.data().totalDue || 0) + a });
+            }
+            alert("Rent Added!"); loadRooms(); closeModal();
+        };
+
+        window.initiatePayment = (uid, due) => {
+            openModal("Receive Payment", `<label class="edit-label">Amount (₹):</label><input type="number" id="pa" placeholder="Due: ₹${due}"><label class="edit-label">Date:</label><input type="date" id="pd" value="${new Date().toISOString().split('T')[0]}"><button class="btn-gold" style="width:100%" onclick="savePayment('${uid}', ${due})">Confirm</button>`);
+        };
+
+        window.savePayment = async (uid, due) => {
+            const a = Number(document.getElementById('pa').value), d = document.getElementById('pd').value;
+            await updateDoc(doc(db, "users", uid), { totalDue: due - a });
+            await addDoc(collection(db, "payments"), { tenantId: uid, amount: a, type: "Manual", date: new Date(d), archived: false });
+            alert("Payment Logged!"); loadRooms(); closeModal();
+        };
+
+        window.calculateMonthlyCollection = async () => {
+            const snap = await getDocs(collection(db, "payments"));
+            let total = 0;
+            snap.forEach(d => { if(!d.data().archived) total += Number(d.data().amount); });
+            openModal("Monthly Finance", `<div style="text-align:center;"><h1 style="color:var(--green); font-size:2.5rem;">₹${total}</h1><p style="opacity:0.6">Total Revenue</p><button class="btn-red" style="width:100%" onclick="resetReportOnly()">🔄 Reset Tracker</button></div>`);
+        };
+
+        window.resetReportOnly = async () => {
+           if(currentAdmin.email !== 'marquesjoe07@gmail.com') return alert("Master Admin only!");
+           if(confirm("Reset revenue?")) {
+               const snap = await getDocs(collection(db, "payments"));
+               snap.forEach(async d => await updateDoc(doc(db, "payments", d.id), { archived: true }));
+               alert("Reset!"); closeModal();
+           }
+        };
+
+        window.resetMonthFull = async () => {
+            if(confirm("Reset ALL dues to ₹0?")) {
+                const snap = await getDocs(query(collection(db, "users"), where("role", "==", "tenant")));
+                snap.forEach(async d => await updateDoc(doc(db, "users", d.id), { totalDue: 0 }));
+                alert("Cleared."); loadRooms();
+            }
+        };
+
+        window.loadDirectory = async () => {
+            const snap = await getDocs(collection(db, "users"));
+            let h = "";
+            snap.forEach(d => {
+                const u = d.data();
+                if(u.role === 'tenant') {
+                    h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid rgba(255,255,255,0.05);"><span><b>${u.name}</b><br><small>${u.phone || 'No Phone'}</small></span><div style="display:flex; gap:8px;"><button class="btn-gold" style="padding:6px 12px" onclick="viewTenantDetail('${d.id}')">⚙️</button><button class="btn-red" style="padding:6px 12px" onclick="deleteTenant('${d.id}')">🗑️</button></div></div>`;
+                }
+            });
+            openModal("Directory", h);
+        };
+
+        window.deleteTenant = async (id) => { if(confirm("Confirm Delete?")) { await deleteDoc(doc(db, "users", id)); alert("Removed."); loadRooms(); closeModal(); } };
+
+        window.loadApprovals = async () => {
+            const snap = await getDocs(collection(db, "pending_requests"));
+            let html = "";
+            snap.forEach(d => {
+                const data = d.data();
+                html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:10px; background:rgba(255,255,255,0.03); border-radius:10px;"><span><b>${data.name}</b></span><div style="display:flex; gap:8px;"><button class="btn-gold" onclick="approveUser('${d.id}','${data.name}','${data.email}','${data.phone}','${data.parent}','${data.aadharPhoto}')">✅</button><button class="btn-red" onclick="rejectUser('${d.id}')">❌</button></div></div>`;
+            });
+            openModal("New Requests", html || "Zero requests.");
+        };
+
+        window.approveUser = async (uid, n, e, p, pr, photo) => {
+            const r=prompt("Room No:"), b=prompt("Bed No:");
+            if(!r || !b) return;
+            await setDoc(doc(db, "users", uid), { uid, name: n, email: e, phone: p, parentPhone: pr, room: r, bed: b, role: 'tenant', totalDue: 0, aadharPhoto: photo, photo: "" });
+            await deleteDoc(doc(db, "pending_requests", uid)); location.reload();
+        };
+
+        window.rejectUser = async (id) => { if(confirm("Reject?")) { await deleteDoc(doc(db, "pending_requests", id)); location.reload(); } };
+
+        window.openSubAdminModal = () => { openModal("Create Admin", `<label class="edit-label">Name:</label><input type="text" id="sn" placeholder="Name"><label class="edit-label">Email:</label><input type="email" id="se" placeholder="Email"><label class="edit-label">Password:</label><input type="password" id="sp" placeholder="******"><button class="btn-gold" style="width:100%" onclick="saveSubAdminManual()">Authorize</button>`); };
+
+        window.saveSubAdminManual = async () => {
+            const n=document.getElementById('sn').value, e=document.getElementById('se').value, p=document.getElementById('sp').value;
+            try { const res = await createUserWithEmailAndPassword(auth, e, p); await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, name: n, email: e, role: 'sub-admin', photo: "" }); alert("Created!"); closeModal(); } catch(err) { alert(err.message); }
         };
 
         window.closeModal = () => document.getElementById('modal').style.display = 'none';
