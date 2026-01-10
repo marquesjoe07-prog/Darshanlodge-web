@@ -3,65 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal - Darshan Lodge</title>
+    <title>Darshan Lodge - Premium Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --glass: rgba(255, 255, 255, 0.1); }
-        body { margin: 0; background: #000a1a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .glass-card { background: var(--glass); backdrop-filter: blur(15px); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 8px 0; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; box-sizing: border-box; }
-        .btn-gold { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 8px; color: black; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        :root { 
+            --gold: #d4af37; 
+            --gold-light: #f1d592;
+            --dark: #000a1a; 
+            --glass: rgba(255, 255, 255, 0.05);
+            --gold-glow: rgba(212, 175, 55, 0.6);
+        }
+        
+        body { 
+            margin: 0; 
+            background: var(--dark); 
+            background-image: 
+                radial-gradient(circle at 20% 30%, #001a33 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, #001a33 0%, transparent 40%);
+            color: white; 
+            font-family: 'Poppins', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* DYNAMIC ANIMATION BACKGROUND */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, var(--gold-glow) 0%, transparent 10%);
+            background-size: 50px 50px;
+            opacity: 0.05;
+            animation: moveBg 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes moveBg {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-50px, -50px); }
+        }
+
+        /* PREMIUM PORTAL CARD */
+        .portal-card { 
+            background: var(--glass); 
+            backdrop-filter: blur(30px); 
+            padding: 45px 35px; 
+            border-radius: 40px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            position: relative;
+            animation: slideUp 1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* BOXED BRANDING */
+        .brand-container {
+            border: 2px solid var(--gold);
+            padding: 10px 20px;
+            display: inline-block;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 20px var(--gold-glow);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .brand-logo { 
+            font-weight: 800; 
+            font-size: 1.8rem; 
+            letter-spacing: 4px; 
+            color: var(--gold); 
+            text-transform: uppercase;
+        }
+
+        .brand-sub { 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            letter-spacing: 6px; 
+            opacity: 0.8; 
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        /* FORM ELEMENTS */
+        input { 
+            width: 100%; 
+            padding: 15px 20px; 
+            margin: 12px 0; 
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 18px; 
+            color: white; 
+            box-sizing: border-box; 
+            font-family: 'Poppins';
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            transform: scale(1.02);
+        }
+
+        .btn-gold { 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(135deg, var(--gold), #8a6d1d); 
+            border: none; 
+            border-radius: 18px; 
+            color: #000; 
+            font-weight: 800; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.4s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .btn-gold:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px var(--gold-glow);
+        }
+
+        /* ROLE SELECTION CARDS */
+        .role-grid {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .role-box {
+            flex: 1;
+            padding: 30px 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .role-box:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+
+        .role-box i { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+        .footer-link {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        .footer-link:hover { opacity: 1; color: var(--gold); text-decoration: underline; }
+
         .hidden { display: none; }
+
+        /* SCROLLBAR FOR SIGNUP */
+        .scroll-area {
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div class="glass-card" id="mainCard">
+
+    <div class="portal-card" id="mainCard">
         <div id="roleView">
-            <h2 style="color: var(--gold);">DARSHAN LODGE</h2>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn-gold" style="flex:1" onclick="showAuth('admin')">Admin</button>
-                <button class="btn-gold" style="flex:1" onclick="showAuth('tenant')">Tenant</button>
+            <div class="brand-container">
+                <div class="brand-logo">Darshan</div>
+            </div>
+            <span class="brand-sub">Lodge Portal</span>
+            
+            <p style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 30px;">Access your digital residence gateway</p>
+            
+            <div class="role-grid">
+                <div class="role-box" onclick="showAuth('admin')">
+                    <i>🔑</i> Admin
+                </div>
+                <div class="role-box" onclick="showAuth('tenant')">
+                    <i>👤</i> Tenant
+                </div>
             </div>
         </div>
 
         <div id="authView" class="hidden">
-            <h3 id="authTitle" style="color: var(--gold);">Login</h3>
+            <h3 id="authTitle" style="color: var(--gold); margin-bottom: 25px; font-weight: 800;">Portal Login</h3>
             <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="pass" placeholder="Password">
-            <button class="btn-gold" onclick="handleLogin()">Sign In</button>
-            <p id="signupLink" class="hidden" onclick="showSignup()" style="cursor:pointer; font-size:0.8rem; text-decoration:underline;">New Tenant? Sign Up</p>
-            <p onclick="location.reload()" style="cursor:pointer; opacity:0.5; font-size:0.8rem;">← Back</p>
+            
+            <button class="btn-gold" onclick="handleLogin()">Authorize Login</button>
+            
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <p onclick="forgotPassword()" class="footer-link" style="color:var(--gold-light);">Recovery Account (Forgot Password?)</p>
+                <p id="signupLink" class="hidden footer-link" onclick="showSignup()">New Resident? Create Account</p>
+                <p onclick="location.reload()" class="footer-link">← Switch Role</p>
+            </div>
         </div>
 
         <div id="signupView" class="hidden">
-            <h3 style="color: var(--gold);">Registration</h3>
-            <input type="text" id="sName" placeholder="Full Name">
-            <input type="email" id="sEmail" placeholder="Login Email">
-            <input type="password" id="sPass" placeholder="Login Password">
-            <input type="tel" id="sPhone" placeholder="Mobile Number">
-            <input type="tel" id="sParent" placeholder="Parent Number">
-            <label style="font-size:0.7rem; display:block; margin-top:5px;">Aadhar Upload (<50kb Auto)</label>
-            <input type="file" id="sAadhar" accept="image/*">
-            <button class="btn-gold" onclick="submitSignup()">Request Approval</button>
-            <p onclick="location.reload()" style="cursor:pointer; opacity:0.5; font-size:0.8rem;">← Back</p>
+            <h3 style="color: var(--gold); margin-bottom: 20px; font-weight: 800;">Resident Registration</h3>
+            <div class="scroll-area">
+                <input type="text" id="sName" placeholder="Full Name">
+                <input type="email" id="sEmail" placeholder="Email ID">
+                <input type="password" id="sPass" placeholder="Set Password">
+                <input type="tel" id="sPhone" placeholder="Mobile Number">
+                <input type="tel" id="sParent" placeholder="Guardian Number">
+                
+                <div style="text-align: left; margin: 10px 0 0 5px;">
+                    <label style="font-size:0.6rem; color: var(--gold); letter-spacing: 1px;">UPLOAD IDENTITY (AADHAR)</label>
+                </div>
+                <input type="file" id="sAadhar" accept="image/*" style="font-size: 0.7rem;">
+            </div>
+            
+            <button class="btn-gold" onclick="submitSignup()">Send for Approval</button>
+            <p onclick="location.reload()" class="footer-link">← Back to Login</p>
         </div>
     </div>
 
     <script type="module">
-        // In lines ko dhyan se check karein aur replace karein
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword // Iska hona zaroori hai
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    setDoc, // Iska hona bhi zaroori hai
-    collection 
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { 
+            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail 
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { 
+            getFirestore, doc, getDoc, setDoc 
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDcl5VCCHMuwVDbqObs4oIntjBbC9x0yU0",
@@ -71,14 +256,21 @@ import {
             messagingSenderId: "834416173936",
             appId: "1:834416173936:web:c6e62b396e5072f3e7e5b5"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // --- NAVIGATION LOGIC ---
         window.showAuth = (role) => {
             document.getElementById('roleView').classList.add('hidden');
             document.getElementById('authView').classList.remove('hidden');
-            if(role === 'tenant') document.getElementById('signupLink').classList.remove('hidden');
+            if(role === 'tenant') {
+                document.getElementById('signupLink').classList.remove('hidden');
+                document.getElementById('authTitle').innerText = "Tenant Access";
+            } else {
+                document.getElementById('authTitle').innerText = "Admin Console";
+            }
         };
 
         window.showSignup = () => {
@@ -86,14 +278,17 @@ import {
             document.getElementById('signupView').classList.remove('hidden');
         };
 
+        // --- LOGIN LOGIC ---
         window.handleLogin = async () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
+            if(!e || !p) return alert("Bhai, Details dalo!");
+
             try {
                 const res = await signInWithEmailAndPassword(auth, e, p);
                 const snap = await getDoc(doc(db, "users", res.user.uid));
-                // index.html ke handleLogin function ke andar
-              if(snap.exists()) {
+                
+                if(snap.exists()) {
                     const userData = snap.data();
                     if(userData.role === 'admin' || userData.role === 'sub-admin') {
                         window.location.href = 'admin.html';
@@ -101,67 +296,64 @@ import {
                         window.location.href = 'tenant.html'; 
                     }
                 } else {
-                    alert("Aapki profile nahi mili. Admin approval ka wait karein.");
+                    alert("Profile not found! Please contact admin.");
                 }
-            } catch(err) { 
-                alert("Login Error: " + err.message); 
-            }
+            } catch(err) { alert("Login failed: " + err.message); }
         };
 
-        // --- Updated Signup Logic with Image Compression ---
-    window.submitSignup = async () => {
-    const e = document.getElementById('sEmail').value;
-    const p = document.getElementById('sPass').value;
-    const name = document.getElementById('sName').value;
-    const file = document.getElementById('sAadhar').files[0];
-
-    if(!file) return alert("Please upload Aadhar image first!");
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = async () => {
-            // --- 50kb Compression Logic Start ---
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 400; // Size chhota karne ke liye
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            // Image ko 0.5 (50%) quality par compress kar rahe hain taaki 50kb se kam ho jaye
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5); 
-            // --- Compression Logic End ---
-
+        // --- FORGOT PASSWORD ---
+        window.forgotPassword = async () => {
+            const email = document.getElementById('email').value;
+            if(!email) return alert("Bhai, email toh dalo pehle!");
             try {
-                // 1. Create Auth Account
-                const res = await createUserWithEmailAndPassword(auth, e, p);
-                const uid = res.user.uid;
-
-                // 2. Save Data with Compressed Image to Pending Requests
-                await setDoc(doc(db, "pending_requests", uid), {
-                    uid: uid,
-                    name: name,
-                    email: e,
-                    phone: document.getElementById('sPhone').value,
-                    parent: document.getElementById('sParent').value,
-                    aadharPhoto: compressedBase64, // Ab ye 50kb ke andar rahega
-                    role: 'tenant',
-                    status: 'pending'
-                });
-
-                alert("Account created and image compressed! Admin approval ka wait karein.");
-                location.reload();
-            } catch(err) { 
-                alert("Error: " + err.message); 
-            }
+                await sendPasswordResetEmail(auth, email);
+                alert("Reset link sent! Check your inbox.");
+            } catch(err) { alert("Error: " + err.message); }
         };
-    };
-};
+
+        // --- SIGNUP LOGIC WITH COMPRESSION ---
+        window.submitSignup = async () => {
+            const e = document.getElementById('sEmail').value;
+            const p = document.getElementById('sPass').value;
+            const name = document.getElementById('sName').value;
+            const file = document.getElementById('sAadhar').files[0];
+
+            if(!e || !p || !name || !file) return alert("Fill all details & upload ID!");
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 400;
+                    const scale = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+
+                    try {
+                        const res = await createUserWithEmailAndPassword(auth, e, p);
+                        await setDoc(doc(db, "pending_requests", res.user.uid), {
+                            uid: res.user.uid,
+                            name: name,
+                            email: e,
+                            phone: document.getElementById('sPhone').value,
+                            parent: document.getElementById('sParent').value,
+                            aadharPhoto: compressedBase64,
+                            role: 'tenant',
+                            status: 'pending',
+                            date: new Date()
+                        });
+                        alert("Application sent! Wait for approval.");
+                        location.reload();
+                    } catch(err) { alert("Error: " + err.message); }
+                };
+            };
+        };
     </script>
 </body>
 </html>
