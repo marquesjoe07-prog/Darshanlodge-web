@@ -127,18 +127,25 @@
 
     <div id="profileModal" class="modal">
         <div class="modal-box">
+            <h2 style="color:var(--gold); margin:0 0 20px; font-weight: 800;">MY PROFILE</h2>
             <div class="avatar-circle" style="width:80px; height:80px; margin:0 auto 10px; font-size:1.8rem;" id="modalAvatar">?</div>
             <input type="file" id="photoUpload" style="display:none" accept="image/*" onchange="uploadPhoto(this)">
-            <button class="status-pill" style="cursor:pointer; background:none;" onclick="document.getElementById('photoUpload').click()">Update Photo</button>
+            <button class="status-pill" style="cursor:pointer; background:none; margin-bottom: 20px;" onclick="document.getElementById('photoUpload').click()">Update Photo</button>
             
-            <h2 id="pName" style="color:var(--gold); margin:15px 0 5px;">Name</h2>
-            <div style="text-align: left; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; font-size: 0.85rem; line-height: 1.8;">
-                <div><b>Phone:</b> <span id="pPhone">--</span></div>
-                <div><b>Guardian:</b> <span id="pParent">--</span></div>
-                <div><b>Residence:</b> Room <span id="pRoom">--</span> / Bed <span id="pBed">--</span></div>
+            <div style="text-align: left; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; font-size: 0.85rem; line-height: 2;">
+                <div><b style="color:var(--gold);">Full Name:</b> <span id="pName">--</span></div>
+                <div><b style="color:var(--gold);">Email ID:</b> <span id="pEmail">--</span></div>
+                <div><b style="color:var(--gold);">Phone No:</b> <span id="pPhone">--</span></div>
+                <div><b style="color:var(--gold);">Guardian No:</b> <span id="pParent">--</span></div>
+                <hr style="opacity: 0.1; margin: 10px 0;">
+                <div style="display:flex; justify-content: space-between;">
+                    <span><b style="color:var(--gold);">Room No:</b> <span id="pRoom">--</span></span>
+                    <span><b style="color:var(--gold);">Bed No:</b> <span id="pBed">--</span></span>
+                </div>
             </div>
-            <button class="btn-pay" style="margin-top:20px; background:#222;" onclick="closeModal('profileModal')">Close</button>
-            <p onclick="logout()" style="color:var(--red); font-size:0.7rem; margin-top:15px; cursor:pointer; font-weight:bold;">LOGOUT</p>
+            
+            <button class="btn-pay" style="margin-top:25px; background:#222; font-size: 0.85rem;" onclick="closeModal('profileModal')">Close Portal</button>
+            <p onclick="logout()" style="color:var(--red); font-size:0.75rem; margin-top:20px; cursor:pointer; font-weight:bold; letter-spacing: 1px;">LOGOUT SESSION</p>
         </div>
     </div>
 
@@ -184,7 +191,7 @@
             } else { window.location.href = 'index.html'; }
         });
 
-        // Resize Logic
+        // Resize & Upload Photo
         window.uploadPhoto = (input) => {
             const file = input.files[0];
             if (file) {
@@ -210,7 +217,7 @@
             }
         };
 
-        // Chat Box
+        // Chat Logic
         window.openChatModal = () => {
             document.getElementById('chatModal').style.display = 'flex';
             const q = query(collection(db, "chats"), orderBy("date", "asc"), limit(50));
@@ -236,7 +243,7 @@
 
         window.deleteMsg = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "chats", id)); };
 
-        // Authorities
+        // UI Helpers
         async function fetchAdminDirectory() {
             const table = document.getElementById('adminTableBody');
             const q = query(collection(db, "users"), where("role", "!=", "tenant"));
@@ -249,7 +256,6 @@
             });
         }
 
-        // Dashboard Render
         function renderDashboard() {
             document.getElementById('userName').innerText = `Hello! ${currentUser.name}`;
             document.getElementById('displayDue').innerText = `₹ ${currentUser.totalDue || 0}`;
@@ -260,8 +266,9 @@
                 av.innerHTML = `<img src="${currentUser.photo}">`;
                 mav.innerHTML = `<img src="${currentUser.photo}">`;
             } else {
-                av.innerText = currentUser.name.charAt(0).toUpperCase();
-                mav.innerText = currentUser.name.charAt(0).toUpperCase();
+                const initial = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : '?';
+                av.innerText = initial;
+                mav.innerText = initial;
             }
         }
 
@@ -294,11 +301,12 @@
         };
 
         window.openProfile = () => {
-            document.getElementById('pName').innerText = currentUser.name;
+            document.getElementById('pName').innerText = currentUser.name || 'N/A';
+            document.getElementById('pEmail').innerText = currentUser.email || 'N/A';
             document.getElementById('pPhone').innerText = currentUser.phone || 'N/A';
             document.getElementById('pParent').innerText = currentUser.parentPhone || 'N/A';
-            document.getElementById('pRoom').innerText = currentUser.room;
-            document.getElementById('pBed').innerText = currentUser.bed;
+            document.getElementById('pRoom').innerText = currentUser.room || '--';
+            document.getElementById('pBed').innerText = currentUser.bed || '--';
             document.getElementById('profileModal').style.display = 'flex';
         };
 
