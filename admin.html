@@ -271,9 +271,43 @@
         window.openSubAdminModal = () => { openModal("New Admin", `<input id="san" placeholder="Name"><input id="sae" placeholder="Email"><input id="sap" placeholder="Password"><button class="btn-gold" style="width:100%" onclick="saveSubAdmin()">Create</button>`); };
         window.saveSubAdmin = async () => { await addDoc(collection(db, "admin_registrations"), { name: document.getElementById('san').value, email: document.getElementById('sae').value, password: document.getElementById('sap').value, role: 'sub-admin' }); alert("Saved!"); closeModal(); };
         window.viewRentHistory = async (uid, name) => { const q = query(collection(db, "payments"), where("tenantId", "==", uid), orderBy("date", "desc")); const snap = await getDocs(q); let rows = ""; snap.forEach(d => { const p = d.data(); rows += `<tr><td>${p.date.toDate().toLocaleDateString('en-GB')}</td><td style="color:var(--green)">₹${p.amount}</td><td>${p.type}</td></tr>`; }); openModal(`Logs: ${name}`, `<div style="max-height:250px; overflow-y:auto;"><table class="history-table"><thead><tr><th>DATE</th><th>AMT</th><th>TYPE</th></tr></thead><tbody>${rows || '<tr><td colspan="3">No records</td></tr>'}</tbody></table></div>`); };
-        window.openProfileModal = () => { openModal("Profile", `<div style="text-align:center;"><img src="${currentAdmin.photo || ''}" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);"><br><input type="file" id="aG" style="display:none" onchange="updateAdmPhoto(this)"><button class="btn-gold" style="margin-top:10px" onclick="document.getElementById('aG').click()">Change Photo</button><br><br><input id="nN" value="${currentAdmin.name}"><button class="btn-gold" onclick="updateAdminName()">Save Name</button><button class="btn-red" style="width:100%;margin-top:20px;" onclick="signOut(auth).then(()=>location.href='index.html')">Logout</button></div>`); };
+        // --- Updated Profile Modal with Email Field ---
+window.openProfileModal = () => {
+    openModal("Admin Profile Settings", `
+        <div style="text-align:center; padding:10px;">
+            <img src="${currentAdmin.photo || 'https://via.placeholder.com/100'}" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--gold); object-fit:cover; margin-bottom:15px;">
+            <br>
+            <input type="file" id="aG" style="display:none" onchange="updateAdmPhoto(this)">
+            <button class="btn-gold" style="font-size:0.7rem; padding:8px 15px;" onclick="document.getElementById('aG').click()">📁 Change Photo</button>
+            <br><br>
+
+            <label class="edit-label">Full Name</label>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input id="nN" value="${currentAdmin.name}" style="margin-bottom:0;">
+                <button class="btn-gold" onclick="updateAdminName()">💾</button>
+            </div>
+
+            <label class="edit-label">Registered Email</label>
+            <input type="text" value="${currentAdmin.email || 'N/A'}" readonly style="opacity:0.6; background:rgba(255,255,255,0.02); cursor:not-allowed; margin-bottom:20px;">
+
+            <hr style="opacity:0.1; margin:15px 0;">
+            
+            <button class="btn-red" style="width:100%; padding:15px; font-weight:800;" onclick="handleLogout()">🚪 LOGOUT FROM DASHBOARD</button>
+        </div>
+    `);
+};
+
         window.updateAdminName = async () => { await updateDoc(doc(db, "users", currentAdmin.uid), { name: document.getElementById('nN').value }); location.reload(); };
         window.updateAdmPhoto = async (input) => { const file = input.files[0]; if (file) { const reader = new FileReader(); reader.onload = async (e) => { await updateDoc(doc(db, "users", currentAdmin.uid), { photo: e.target.result }); location.reload(); }; reader.readAsDataURL(file); } };
+        window.handleLogout = async () => {
+        if(confirm("Bhai, logout karna chahte ho?")) {
+             signOut(auth).then(() => {
+                window.location.href = 'index.html';
+             }).catch((error) => {
+                alert("Logout failed: " + error.message);
+            });
+          }
+     };
     </script>
 </body>
 </html>
