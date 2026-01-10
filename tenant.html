@@ -14,13 +14,18 @@
         
         body { margin: 0; background: var(--dark); color: white; font-family: 'Poppins', sans-serif; min-height: 100vh; padding-top: 80px; }
 
+        /* Top Nav */
         .top-nav { height: 75px; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
         .nav-title { font-weight: 800; color: var(--gold); letter-spacing: 2px; font-size: 0.85rem; }
-        
         .avatar-circle { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); overflow: hidden; cursor: pointer; background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); }
         .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
 
         .container { max-width: 500px; margin: auto; padding: 20px; box-sizing: border-box; }
+
+        /* Greeting */
+        .greeting-card { margin-bottom: 30px; }
+        .greeting-card p { margin: 0; font-size: 0.8rem; opacity: 0.6; letter-spacing: 1px; }
+        .greeting-card h2 { margin: 5px 0; font-size: 1.8rem; color: var(--gold); font-weight: 700; text-transform: capitalize; }
 
         /* Balance Card */
         .balance-card { background: linear-gradient(145deg, #001a33, #000814); border-radius: 25px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-bottom: 25px; }
@@ -28,17 +33,24 @@
         .status-pill { display: inline-block; padding: 6px 15px; border-radius: 50px; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); font-size: 0.7rem; font-weight: 600; margin: 5px; }
 
         /* Action Grid */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .btn-action { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.2); padding: 15px; border-radius: 18px; color: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 600; }
-        .btn-action:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); transform: translateY(-3px); }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .btn-action { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.2); padding: 12px; border-radius: 18px; color: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 600; }
+        .btn-action:hover { background: rgba(212, 175, 55, 0.1); transform: translateY(-3px); }
 
-        /* Chat Styles */
-        #chatContainer { height: 300px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .chat-msg { background: var(--glass); padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 0.8rem; position: relative; }
-        .chat-msg b { color: var(--gold); display: block; font-size: 0.7rem; margin-bottom: 2px; }
+        /* Admin Table */
+        .section-title { font-size: 0.75rem; color: var(--gold); margin: 30px 0 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; border-left: 3px solid var(--gold); padding-left: 10px;}
+        .table-card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .role-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: rgba(212, 175, 55, 0.1); color: var(--gold); border: 0.5px solid var(--gold); }
+
+        /* Chat UI */
+        #chatContainer { height: 300px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        .chat-msg { background: var(--glass); padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 0.8rem; }
+        .chat-msg b { color: var(--gold); display: block; font-size: 0.7rem; }
         .delete-msg { color: var(--red); cursor: pointer; float: right; font-size: 0.8rem; margin-left: 10px; }
 
-        .btn-pay { width: 100%; padding: 18px; background: var(--blue); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 1rem; cursor: pointer; }
+        .btn-pay { width: 100%; padding: 18px; background: var(--blue); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.3s; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); display: none; z-index: 200; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: #001a33; border: 1px solid var(--gold); padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
 
@@ -54,6 +66,11 @@
     </div>
 
     <div class="container">
+        <div class="greeting-card">
+            <p>Welcome back to your residence,</p>
+            <h2 id="userName">Resident</h2>
+        </div>
+
         <div class="balance-card">
             <span>Outstanding Balance</span>
             <h1 id="displayDue">₹ 0</h1>
@@ -65,29 +82,46 @@
 
         <div class="action-grid">
             <button class="btn-action" onclick="openChatModal()"><span>💬</span> Community Chat</button>
-            <button class="btn-action" onclick="openProfile()"><span>👤</span> My Profile</button>
+            <button class="btn-action" onclick="openComplaintModal()"><span>📢</span> Support & Query</button>
+            <button class="btn-action" onclick="openProfile()" style="grid-column: span 2;"><span>👤</span> My Profile Details</button>
         </div>
 
         <button class="btn-pay" onclick="handlePayment()">Settle Dues Securely</button>
+        <p style="text-align: center; font-size: 0.6rem; opacity: 0.5; margin-top: 12px;">
+            ⚠️ If payment is blocked, please pay via <b>Scanning QR</b> in office.
+        </p>
 
-        <div style="font-size: 0.75rem; color: var(--gold); margin-top: 30px; border-left: 3px solid var(--gold); padding-left: 10px;">RECENT PAYMENTS</div>
-        <div style="background: var(--glass); border-radius: 15px; margin-top: 10px; overflow: hidden;">
-            <table id="historyTable" style="width: 100%; border-collapse: collapse;">
-                <tbody><tr><td style="padding: 20px; text-align: center; opacity: 0.5;">No history</td></tr></tbody>
+        <div class="section-title">Lodge Authorities</div>
+        <div class="table-card">
+            <table>
+                <tbody id="adminTableBody">
+                    <tr><td style="text-align:center; opacity:0.5;">Loading authorities...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-title">Recent Payments</div>
+        <div class="table-card">
+            <table id="historyTable">
+                <tbody>
+                    <tr><td style="text-align:center; opacity:0.5;">No history found</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
 
+    <footer>©️ 2026 DARSHAN LODGE | ALL RIGHTS RESERVED</footer>
+
     <div id="chatModal" class="modal">
         <div class="modal-box" style="max-width: 500px;">
-            <h3 style="color:var(--gold); margin-top:0;">Lodge Community Chat</h3>
+            <h3 style="color:var(--gold); margin:0 0 15px;">Community Chat</h3>
             <div id="chatContainer"></div>
             <div style="display: flex; gap: 5px;">
-                <input type="text" id="chatInput" placeholder="Type a message...">
+                <input type="text" id="chatInput" placeholder="Message...">
                 <button class="btn-pay" style="width: 80px; padding: 10px;" onclick="sendChatMessage()">Send</button>
             </div>
-            <button class="btn-pay" style="margin-top:10px; background: none; border: 1px solid #444;" onclick="closeModal('chatModal')">Close</button>
-            <button id="masterResetChat" style="display:none; color: var(--red); background: none; border: none; margin-top: 10px; cursor: pointer;" onclick="clearAllChats()">Clear All Chats</button>
+            <button class="btn-pay" style="margin-top:10px; background: #222;" onclick="closeModal('chatModal')">Close</button>
+            <button id="masterResetChat" style="display:none; color: var(--red); background: none; border: none; margin-top: 10px; cursor: pointer;" onclick="clearAllChats()">Clear History</button>
         </div>
     </div>
 
@@ -95,7 +129,7 @@
         <div class="modal-box">
             <div class="avatar-circle" style="width:80px; height:80px; margin:0 auto 10px; font-size:1.8rem;" id="modalAvatar">?</div>
             <input type="file" id="photoUpload" style="display:none" accept="image/*" onchange="uploadPhoto(this)">
-            <button class="status-pill" style="cursor:pointer; background:none;" onclick="document.getElementById('photoUpload').click()">Update Profile Photo</button>
+            <button class="status-pill" style="cursor:pointer; background:none;" onclick="document.getElementById('photoUpload').click()">Update Photo</button>
             
             <h2 id="pName" style="color:var(--gold); margin:15px 0 5px;">Name</h2>
             <div style="text-align: left; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; font-size: 0.85rem; line-height: 1.8;">
@@ -105,6 +139,15 @@
             </div>
             <button class="btn-pay" style="margin-top:20px; background:#222;" onclick="closeModal('profileModal')">Close</button>
             <p onclick="logout()" style="color:var(--red); font-size:0.7rem; margin-top:15px; cursor:pointer; font-weight:bold;">LOGOUT</p>
+        </div>
+    </div>
+
+    <div id="compModal" class="modal">
+        <div class="modal-box">
+            <h3 style="color:var(--gold); margin-top:0;">Lodge Support</h3>
+            <textarea id="compMsg" rows="4" placeholder="Describe your complaint..."></textarea>
+            <button class="btn-pay" onclick="submitQuery()">Submit Query</button>
+            <button class="btn-pay" style="margin-top:10px; background:none; border:1px solid #444;" onclick="closeModal('compModal')">Cancel</button>
         </div>
     </div>
 
@@ -135,14 +178,13 @@
                     currentUser = { ...snap.data(), uid: user.uid };
                     renderDashboard();
                     fetchHistory();
-                    if(currentUser.role === 'master' || currentUser.email === 'marquesjoe07@gmail.com') {
-                        document.getElementById('masterResetChat').style.display = 'block';
-                    }
+                    fetchAdminDirectory();
+                    if(currentUser.email === 'marquesjoe07@gmail.com') document.getElementById('masterResetChat').style.display = 'block';
                 }
             } else { window.location.href = 'index.html'; }
         });
 
-        // AUTO-RESIZE & UPLOAD LOGIC
+        // Resize Logic
         window.uploadPhoto = (input) => {
             const file = input.files[0];
             if (file) {
@@ -156,33 +198,30 @@
                         const scaleSize = MAX_WIDTH / img.width;
                         canvas.width = MAX_WIDTH;
                         canvas.height = img.height * scaleSize;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        const resizedBase64 = canvas.toDataURL('image/jpeg', 0.7); 
-                        try {
-                            await updateDoc(doc(db, "users", currentUser.uid), { photo: resizedBase64 });
-                            currentUser.photo = resizedBase64;
-                            renderDashboard();
-                            alert("Photo Set!");
-                        } catch (err) { alert("Error: " + err.message); }
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const resized = canvas.toDataURL('image/jpeg', 0.7); 
+                        await updateDoc(doc(db, "users", currentUser.uid), { photo: resized });
+                        currentUser.photo = resized;
+                        renderDashboard();
+                        alert("Profile Updated!");
                     };
                 };
                 reader.readAsDataURL(file);
             }
         };
 
-        // REAL-TIME COMMUNITY CHAT
+        // Chat Box
         window.openChatModal = () => {
             document.getElementById('chatModal').style.display = 'flex';
             const q = query(collection(db, "chats"), orderBy("date", "asc"), limit(50));
             onSnapshot(q, (snap) => {
                 const container = document.getElementById('chatContainer');
                 container.innerHTML = "";
-                snap.forEach(docSnap => {
-                    const m = docSnap.data();
+                snap.forEach(d => {
+                    const m = d.data();
                     const isMaster = currentUser.email === 'marquesjoe07@gmail.com';
-                    const delBtn = isMaster ? `<span class="delete-msg" onclick="deleteMsg('${docSnap.id}')">🗑️</span>` : "";
-                    container.innerHTML += `<div class="chat-msg"><b>${m.name}</b> ${m.text} ${delBtn}</div>`;
+                    const del = isMaster ? `<span class="delete-msg" onclick="deleteMsg('${d.id}')">🗑️</span>` : "";
+                    container.innerHTML += `<div class="chat-msg"><b>${m.name}</b> ${m.text} ${del}</div>`;
                 });
                 container.scrollTop = container.scrollHeight;
             });
@@ -191,26 +230,28 @@
         window.sendChatMessage = async () => {
             const txt = document.getElementById('chatInput').value;
             if(!txt) return;
-            await addDoc(collection(db, "chats"), {
-                name: currentUser.name,
-                text: txt,
-                date: serverTimestamp()
-            });
+            await addDoc(collection(db, "chats"), { name: currentUser.name, text: txt, date: serverTimestamp() });
             document.getElementById('chatInput').value = "";
         };
 
-        window.deleteMsg = async (id) => {
-            if(confirm("Delete message?")) await deleteDoc(doc(db, "chats", id));
-        };
+        window.deleteMsg = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "chats", id)); };
 
-        window.clearAllChats = async () => {
-            if(confirm("DANGER: Wipe entire chat history?")) {
-                const snap = await getDocs(collection(db, "chats"));
-                snap.forEach(async d => await deleteDoc(doc(db, "chats", d.id)));
-            }
-        };
+        // Authorities
+        async function fetchAdminDirectory() {
+            const table = document.getElementById('adminTableBody');
+            const q = query(collection(db, "users"), where("role", "!=", "tenant"));
+            const snap = await getDocs(q);
+            table.innerHTML = "";
+            snap.forEach(d => {
+                const data = d.data();
+                const roleLabel = data.email === 'marquesjoe07@gmail.com' ? 'Master Admin' : 'Sub Admin';
+                table.innerHTML += `<tr><td style="font-weight:600;">${data.name}</td><td style="text-align:right;"><span class="role-badge">${roleLabel}</span></td></tr>`;
+            });
+        }
 
+        // Dashboard Render
         function renderDashboard() {
+            document.getElementById('userName').innerText = `Hello! ${currentUser.name}`;
             document.getElementById('displayDue').innerText = `₹ ${currentUser.totalDue || 0}`;
             document.getElementById('roomPill').innerText = `Room: ${currentUser.room}`;
             document.getElementById('bedPill').innerText = `Bed: ${currentUser.bed}`;
@@ -228,13 +269,23 @@
             const q = query(collection(db, "payments"), where("tenantId", "==", currentUser.uid), orderBy("date", "desc"));
             const snap = await getDocs(q);
             const tbody = document.querySelector('#historyTable tbody');
-            tbody.innerHTML = "";
+            tbody.innerHTML = snap.empty ? "<tr><td colspan='2' style='text-align:center; padding:20px; opacity:0.5;'>No transactions</td></tr>" : "";
             snap.forEach(d => {
                 const p = d.data();
                 const dt = p.date ? p.date.toDate().toLocaleDateString('en-GB') : "N/A";
-                tbody.innerHTML += `<tr><td style="padding:15px; border-bottom:1px solid #111;">${dt}<br><small>${p.type}</small></td><td style="text-align:right; padding:15px; font-weight:bold; color:var(--green);">₹${p.amount}</td></tr>`;
+                tbody.innerHTML += `<tr><td><div style="font-weight:600;">Rent Paid</div><small style="opacity:0.5">${dt} • ${p.type}</small></td><td style="text-align:right; font-weight:bold; color:var(--green);">₹${p.amount}</td></tr>`;
             });
         }
+
+        window.submitQuery = async () => {
+            const msg = document.getElementById('compMsg').value;
+            if(!msg) return alert("Write something!");
+            await addDoc(collection(db, "complaints"), {
+                tenantId: currentUser.uid, tenantName: currentUser.name, room: currentUser.room,
+                message: msg, status: "Pending", date: serverTimestamp()
+            });
+            alert("Sent!"); closeModal('compModal');
+        };
 
         window.handlePayment = () => {
             const due = currentUser.totalDue || 0;
@@ -251,6 +302,7 @@
             document.getElementById('profileModal').style.display = 'flex';
         };
 
+        window.openComplaintModal = () => document.getElementById('compModal').style.display = 'flex';
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
     </script>
